@@ -96,11 +96,13 @@ export default function MatchList({ userId }: { userId: string }) {
     switch (stage) {
       case "group":
         return <Badge variant="secondary">Gruppenphase</Badge>;
+      case "round_of_32":
+        return <Badge variant="outline">Achtelfinale (32)</Badge>;
       case "round_of_16":
         return <Badge>Achtelfinale</Badge>;
-      case "quarter_final":
+      case "quarter_finals":
         return <Badge>Viertelfinale</Badge>;
-      case "semi_final":
+      case "semi_finals":
         return <Badge>Halbfinale</Badge>;
       case "third_place":
         return <Badge>Spiel um Platz 3</Badge>;
