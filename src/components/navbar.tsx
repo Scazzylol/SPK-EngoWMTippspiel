@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { getSession } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { auth } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export default async function Navbar() {
@@ -11,15 +9,21 @@ export default async function Navbar() {
   let user = null;
 
   if (sessionToken) {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/get-session`,
-      {
-        headers: { Cookie: `better-auth.session_token=${sessionToken}` },
-        cache: "no-store",
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/get-session`,
+        {
+          headers: { Cookie: `better-auth.session_token=${sessionToken}` },
+          cache: "no-store",
+        }
+      );
+      const data = await response.json();
+      if (response.ok && data?.user) {
+        user = data.user;
       }
-    );
-    const data = await response.json();
-    user = data?.user;
+    } catch {
+      // ignore fetch errors, treat as logged out
+    }
   }
 
   return (
@@ -45,20 +49,26 @@ export default async function Navbar() {
               <form
                 action={async () => {
                   "use server";
-                  const cookieStore = await cookies();
-                  const sessionToken = cookieStore.get("better-auth.session_token")?.value;
-                  if (sessionToken) {
+                  const c = await cookies();
+                  const token = c.get("better-auth.session_token")?.value;
+                  if (token) {
                     await fetch(
                       `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/sign-out`,
                       {
                         method: "POST",
                         headers: {
-                          Cookie: `better-auth.session_token=${sessionToken}`,
-                          "Content-Type": "application/json",
+                          Cookie: `better-auth.session_token=${token}`,
                         },
                       }
                     );
                   }
+                  // Delete cookie on client by setting expired date
+                  c.set("better-auth.session_token", "", {
+                    expires: new Date(0),
+                    path: "/",
+                  });
+                  const { redirect } = await import("next/navigation");
+                  redirect("/login");
                 }}
               >
                 <Button variant="outline" size="sm" type="submit">

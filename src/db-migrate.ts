@@ -25,16 +25,38 @@ async function migrate() {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES better_auth_user(id),
       expires_at TIMESTAMP NOT NULL,
+      token TEXT NOT NULL UNIQUE DEFAULT '',
       created_at TIMESTAMP NOT NULL,
       updated_at TIMESTAMP NOT NULL
     );
   `);
 
+  // Add missing columns if they don't exist (for existing tables)
+  await sql.unsafe(`DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'better_auth_session' AND column_name = 'token') THEN
+      ALTER TABLE better_auth_session ADD COLUMN token TEXT NOT NULL DEFAULT '';
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_better_auth_session_token ON better_auth_session(token);
+    END IF;
+  END $$;`);
+
+  await sql.unsafe(`DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'better_auth_session' AND column_name = 'ip_address') THEN
+      ALTER TABLE better_auth_session ADD COLUMN ip_address TEXT;
+    END IF;
+  END $$;`);
+
+  await sql.unsafe(`DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'better_auth_session' AND column_name = 'user_agent') THEN
+      ALTER TABLE better_auth_session ADD COLUMN user_agent TEXT;
+    END IF;
+  END $$;`);
+
   await sql.unsafe(`
-    CREATE TABLE IF NOT EXISTS better_account (
+   CREATE TABLE IF NOT EXISTS better_auth_account (
       id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL REFERENCES better_auth_user(id),
-      provider_account_id TEXT NOT NULL,
+      user_id TEXT REFERENCES better_auth_user(id),
+      account_id TEXT NOT NULL,
+      provider_account_id TEXT,
       provider_id TEXT NOT NULL,
       access_token TEXT,
       refresh_token TEXT,
@@ -81,6 +103,20 @@ async function migrate() {
       away_score INTEGER NOT NULL
     );
   `);
+
+  // Add account_id column if it doesn't exist (for existing tables)
+  await sql.unsafe(`DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'better_auth_account' AND column_name = 'account_id') THEN
+      ALTER TABLE better_auth_account ADD COLUMN account_id TEXT NOT NULL DEFAULT '';
+    END IF;
+  END $$;`);
+
+  // Make provider_account_id nullable for credential provider compatibility
+  await sql.unsafe(`DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'better_auth_account' AND column_name = 'provider_account_id' AND is_nullable = 'NO') THEN
+      ALTER TABLE better_auth_account ALTER COLUMN provider_account_id DROP NOT NULL;
+    END IF;
+  END $$;`);
 
   console.log("All tables created successfully!");
 

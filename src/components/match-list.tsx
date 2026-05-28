@@ -17,6 +17,7 @@ interface Match {
 export default function MatchList({ userId }: { userId: string }) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<{ [key: string]: { home: string; away: string } }>({});
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
 
@@ -47,8 +48,10 @@ export default function MatchList({ userId }: { userId: string }) {
         const predMap: { [key: string]: { home: string; away: string } } = {};
         for (const p of data) {
           predMap[p.matchId] = { home: String(p.homeScore), away: String(p.awayScore) };
+          savedIds.add(p.matchId);
         }
         setPredictions(predMap);
+        setSavedIds(new Set(savedIds));
       }
     } catch (error) {
       console.error("Failed to fetch predictions:", error);
@@ -84,6 +87,7 @@ export default function MatchList({ userId }: { userId: string }) {
     } catch (error) {
       console.error("Failed to save prediction:", error);
     } finally {
+      setSavedIds((prev) => new Set(prev).add(matchId));
       setSavingId(null);
     }
   };
@@ -177,7 +181,7 @@ export default function MatchList({ userId }: { userId: string }) {
                     onClick={() => savePrediction(match.id)}
                     disabled={savingId === match.id || !predictions[match.id]?.home || !predictions[match.id]?.away}
                   >
-                    {savingId === match.id ? "..." : predictions[match.id] ? "Aktualisieren" : "Tipp speichern"}
+                    {savingId === match.id ? "..." : savedIds.has(match.id) ? "Aktualisieren" : "Tipp speichern"}
                   </Button>
                 </div>
               </div>

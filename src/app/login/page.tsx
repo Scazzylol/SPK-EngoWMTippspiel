@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,17 +24,29 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        await authClient.signIn.email({ email, password });
+        const result = await authClient.signIn.email({ email, password });
+        if (result?.data) {
+          router.push("/matches");
+          router.refresh();
+        } else {
+          setError(result?.error?.message || "Login fehlgeschlagen");
+        }
       } else {
-        await authClient.signUp.email({
+        const result = await authClient.signUp.email({
           name,
           email,
           password,
           callbackURL: "/matches",
         });
+        if (result?.data) {
+          router.push("/matches");
+          router.refresh();
+        } else {
+          setError(result?.error?.message || "Registrierung fehlgeschlagen");
+        }
       }
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      setError(err.message || "Etwas ist schiefgelaufen");
     } finally {
       setLoading(false);
     }
@@ -78,7 +92,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Passwort</Label>
+              <Label htmlFor="password">Passwort (min. 8 Zeichen)</Label>
               <Input
                 id="password"
                 type="password"
@@ -86,7 +100,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
             {error && <p className="text-sm text-red-500">{error}</p>}
