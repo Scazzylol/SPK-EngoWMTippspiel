@@ -6,6 +6,7 @@ import { isAdmin } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { logout } from "@/actions/auth";
 import { SparkasseLogo } from "@/components/sparkasse-logo";
+import { CircleDot, Trophy, Shield } from "lucide-react";
 
 export default async function Navbar() {
   const [session, admin] = await Promise.all([getSession(), isAdmin()]);
@@ -26,21 +27,24 @@ export default async function Navbar() {
             <>
               <Link
                 href="/matches"
-                className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
               >
+                <CircleDot className="h-4 w-4" />
                 Spiele
               </Link>
               <Link
                 href="/leaderboard"
-                className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
               >
+                <Trophy className="h-4 w-4" />
                 Rangliste
               </Link>
               {admin && (
                 <Link
                   href="/admin"
-                  className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
                 >
+                  <Shield className="h-4 w-4" />
                   Admin
                 </Link>
               )}
