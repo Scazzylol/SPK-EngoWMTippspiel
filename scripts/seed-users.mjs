@@ -1,6 +1,7 @@
 import "dotenv/config";
 import crypto from "crypto";
-import { hashPassword } from "@better-auth/utils/dist/password.mjs";
+import { scryptAsync } from "@noble/hashes/scrypt.js";
+import { hex } from "@better-auth/utils/hex";
 
 const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
 if (!connectionString) {
@@ -59,3 +60,15 @@ await sql.end();
 console.log("\nFertig! Alle User wurden angelegt.");
 console.log("Test-User: test1-test10 mit Passwort 'test1234'");
 console.log("Admin-User: admin mit Passwort 'admin123'");
+
+async function hashPassword(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await scryptAsync(password.normalize("NFKC"), salt, {
+    N: 16384,
+    r: 16,
+    p: 1,
+    dkLen: 64,
+    maxmem: 128 * 16384 * 16 * 2,
+  });
+  return `${hex.encode(salt)}:${hex.encode(key)}`;
+}
