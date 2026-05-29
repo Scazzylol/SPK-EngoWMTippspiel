@@ -90,142 +90,142 @@ const teams: TeamData[] = [
   { name: "Panama", code: "PAN", group: "Gruppe L" },
 ];
 
-// UTC times for group stage matches (6 per group)
+// UTC times for group stage matches (6 per group, standard pairing order)
 // Order: (0v1), (2v3), (0v2), (1v3), (0v3), (1v2)
 const GROUP_MATCH_TIMES: Record<string, string[]> = {
   "Gruppe A": [
-    "2026-06-12T01:00:00Z", // MEX vs RSA (Thu Jun 11, 19:00 CST)
-    "2026-06-12T08:00:00Z", // KOR vs CZE (Fri Jun 12, 02:00 CST)
-    "2026-06-18T20:00:00Z", // CZE vs RSA (Thu Jun 18, 16:00 EDT)
-    "2026-06-19T07:00:00Z", // MEX vs KOR (Fri Jun 19, 01:00 CST)
-    "2026-06-25T07:00:00Z", // CZE vs MEX (Thu Jun 25, 01:00 CST)
-    "2026-06-25T07:00:00Z", // RSA vs KOR (Thu Jun 25, 01:00 CST)
+    "2026-06-11T19:00:00Z", // MEX vs RSA
+    "2026-06-12T02:00:00Z", // KOR vs CZE
+    "2026-06-19T01:00:00Z", // MEX vs KOR
+    "2026-06-18T16:00:00Z", // RSA vs CZE
+    "2026-06-25T01:00:00Z", // MEX vs CZE
+    "2026-06-25T01:00:00Z", // RSA vs KOR
   ],
   "Gruppe B": [
-    "2026-06-13T01:00:00Z", // CAN vs BIH (Fri Jun 12, 19:00 EDT)
-    "2026-06-14T02:00:00Z", // QAT vs SUI (Sat Jun 13, 19:00 PDT)
-    "2026-06-19T02:00:00Z", // SUI vs BIH (Thu Jun 18, 19:00 PDT)
-    "2026-06-19T05:00:00Z", // CAN vs QAT (Thu Jun 18, 22:00 PDT)
-    "2026-06-25T02:00:00Z", // SUI vs CAN (Wed Jun 24, 19:00 PDT)
-    "2026-06-25T02:00:00Z", // BIH vs QAT (Wed Jun 24, 19:00 PDT)
+    "2026-06-12T19:00:00Z", // CAN vs BIH
+    "2026-06-13T19:00:00Z", // QAT vs SUI
+    "2026-06-18T22:00:00Z", // CAN vs QAT
+    "2026-06-18T19:00:00Z", // BIH vs SUI
+    "2026-06-24T19:00:00Z", // CAN vs SUI
+    "2026-06-24T19:00:00Z", // BIH vs QAT
   ],
   "Gruppe C": [
-    "2026-06-14T01:00:00Z", // BRA vs MAR (Sat Jun 13, 22:00 EDT)
-    "2026-06-14T05:00:00Z", // HAI vs SCO (Sun Jun 14, 01:00 EDT)
-    "2026-06-20T04:30:00Z", // BRA vs HAI (Fri Jun 19, 00:30 EDT)
-    "2026-06-20T06:00:00Z", // SCO vs MAR (Fri Jun 19, 22:00 EDT)
-    "2026-06-25T02:00:00Z", // SCO vs BRA (Wed Jun 24, 22:00 EDT)
-    "2026-06-25T02:00:00Z", // MAR vs HAI (Wed Jun 24, 22:00 EDT)
+    "2026-06-13T22:00:00Z", // BRA vs MAR
+    "2026-06-14T01:00:00Z", // HAI vs SCO
+    "2026-06-20T00:30:00Z", // BRA vs HAI
+    "2026-06-19T22:00:00Z", // MAR vs SCO
+    "2026-06-24T22:00:00Z", // BRA vs SCO
+    "2026-06-24T22:00:00Z", // MAR vs HAI
   ],
   "Gruppe D": [
-    "2026-06-13T05:00:00Z", // USA vs PAR (Sat Jun 13, 01:00 EDT)
-    "2026-06-14T08:00:00Z", // AUS vs TUR (Sun Jun 14, 04:00 PDT)
-    "2026-06-20T02:00:00Z", // USA vs AUS (Fri Jun 19, 19:00 PDT)
-    "2026-06-20T07:00:00Z", // TUR vs PAR (Sat Jun 20, 03:00 PDT)
-    "2026-06-26T06:00:00Z", // TUR vs USA (Fri Jun 26, 02:00 PDT)
-    "2026-06-26T06:00:00Z", // PAR vs AUS (Fri Jun 26, 02:00 PDT)
+    "2026-06-13T01:00:00Z", // USA vs PAR
+    "2026-06-14T16:00:00Z", // AUS vs TUR
+    "2026-06-19T19:00:00Z", // USA vs AUS
+    "2026-06-20T03:00:00Z", // PAR vs TUR
+    "2026-06-26T02:00:00Z", // USA vs TUR
+    "2026-06-26T02:00:00Z", // PAR vs AUS
   ],
   "Gruppe E": [
-    "2026-06-14T21:00:00Z", // GER vs CUW (Sun Jun 14, 17:00 EDT)
-    "2026-06-15T03:00:00Z", // CIV vs ECU (Sun Jun 14, 23:00 EDT)
-    "2026-06-21T00:00:00Z", // GER vs CIV (Sat Jun 20, 20:00 EDT)
-    "2026-06-21T04:00:00Z", // ECU vs CUW (Sun Jun 21, 00:00 CDT)
-    "2026-06-26T00:00:00Z", // CUW vs CIV (Thu Jun 25, 20:00 EDT)
-    "2026-06-26T00:00:00Z", // ECU vs GER (Thu Jun 25, 20:00 EDT)
+    "2026-06-14T17:00:00Z", // GER vs CUW
+    "2026-06-14T23:00:00Z", // CIV vs ECU
+    "2026-06-20T20:00:00Z", // GER vs CIV
+    "2026-06-21T00:00:00Z", // CUW vs ECU
+    "2026-06-25T20:00:00Z", // GER vs ECU
+    "2026-06-25T20:00:00Z", // CUW vs CIV
   ],
   "Gruppe F": [
-    "2026-06-15T00:00:00Z", // NED vs JPN (Sun Jun 14, 20:00 CDT)
-    "2026-06-15T06:00:00Z", // SWE vs TUN (Mon Jun 15, 02:00 CST)
-    "2026-06-20T21:00:00Z", // NED vs SWE (Sat Jun 20, 17:00 CDT)
-    "2026-06-21T08:00:00Z", // TUN vs JPN (Sun Jun 21, 04:00 CST)
-    "2026-06-26T03:00:00Z", // JPN vs SWE (Thu Jun 25, 23:00 CDT)
-    "2026-06-26T03:00:00Z", // TUN vs NED (Thu Jun 25, 23:00 CDT)
+    "2026-06-14T20:00:00Z", // NED vs JPN
+    "2026-06-15T02:00:00Z", // SWE vs TUN
+    "2026-06-20T17:00:00Z", // NED vs SWE
+    "2026-06-21T04:00:00Z", // JPN vs TUN
+    "2026-06-25T23:00:00Z", // NED vs TUN
+    "2026-06-25T23:00:00Z", // JPN vs SWE
   ],
   "Gruppe G": [
-    "2026-06-15T23:00:00Z", // BEL vs EGY (Mon Jun 15, 19:00 PDT)
-    "2026-06-16T05:00:00Z", // IRN vs NZL (Tue Jun 16, 01:00 EDT)
-    "2026-06-21T23:00:00Z", // BEL vs IRN (Sun Jun 21, 19:00 PDT)
-    "2026-06-22T05:00:00Z", // NZL vs EGY (Mon Jun 22, 01:00 PDT)
-    "2026-06-27T07:00:00Z", // EGY vs IRN (Sat Jun 27, 03:00 PDT)
-    "2026-06-27T07:00:00Z", // NZL vs BEL (Sat Jun 27, 03:00 PDT)
+    "2026-06-15T19:00:00Z", // BEL vs EGY
+    "2026-06-16T01:00:00Z", // IRN vs NZL
+    "2026-06-21T19:00:00Z", // BEL vs IRN
+    "2026-06-22T01:00:00Z", // EGY vs NZL
+    "2026-06-27T03:00:00Z", // BEL vs NZL
+    "2026-06-27T03:00:00Z", // EGY vs IRN
   ],
   "Gruppe H": [
-    "2026-06-15T20:00:00Z", // ESP vs CPV (Mon Jun 15, 16:00 EDT)
-    "2026-06-16T02:00:00Z", // KSA vs URU (Mon Jun 15, 22:00 EDT)
-    "2026-06-21T20:00:00Z", // ESP vs KSA (Sun Jun 21, 16:00 EDT)
-    "2026-06-22T02:00:00Z", // URU vs CPV (Sun Jun 21, 22:00 EDT)
-    "2026-06-27T04:00:00Z", // CPV vs KSA (Sat Jun 27, 00:00 CDT)
-    "2026-06-27T04:00:00Z", // URU vs ESP (Sat Jun 27, 00:00 CST)
+    "2026-06-15T16:00:00Z", // ESP vs CPV
+    "2026-06-15T22:00:00Z", // KSA vs URU
+    "2026-06-21T16:00:00Z", // ESP vs KSA
+    "2026-06-21T22:00:00Z", // CPV vs URU
+    "2026-06-27T00:00:00Z", // ESP vs URU
+    "2026-06-27T00:00:00Z", // CPV vs KSA
   ],
   "Gruppe I": [
-    "2026-06-16T23:00:00Z", // FRA vs SEN (Tue Jun 16, 19:00 EDT)
-    "2026-06-17T02:00:00Z", // IRQ vs NOR (Tue Jun 16, 22:00 EDT)
-    "2026-06-23T01:00:00Z", // FRA vs IRQ (Mon Jun 22, 21:00 EDT)
-    "2026-06-23T04:00:00Z", // NOR vs SEN (Tue Jun 23, 00:00 EDT)
-    "2026-06-26T23:00:00Z", // NOR vs FRA (Fri Jun 26, 19:00 EDT)
-    "2026-06-26T23:00:00Z", // SEN vs IRQ (Fri Jun 26, 19:00 EDT)
+    "2026-06-16T19:00:00Z", // FRA vs SEN
+    "2026-06-16T22:00:00Z", // IRQ vs NOR
+    "2026-06-22T21:00:00Z", // FRA vs IRQ
+    "2026-06-23T00:00:00Z", // SEN vs NOR
+    "2026-06-26T19:00:00Z", // FRA vs NOR
+    "2026-06-26T19:00:00Z", // SEN vs IRQ
   ],
   "Gruppe J": [
-    "2026-06-17T05:00:00Z", // ARG vs ALG (Wed Jun 17, 01:00 CDT)
-    "2026-06-17T08:00:00Z", // AUT vs JOR (Wed Jun 17, 04:00 PDT)
-    "2026-06-22T21:00:00Z", // ARG vs AUT (Mon Jun 22, 17:00 CDT)
-    "2026-06-23T07:00:00Z", // JOR vs ALG (Tue Jun 23, 03:00 PDT)
-    "2026-06-28T06:00:00Z", // ALG vs AUT (Sun Jun 28, 02:00 CDT)
-    "2026-06-28T06:00:00Z", // JOR vs ARG (Sun Jun 28, 02:00 CDT)
+    "2026-06-17T01:00:00Z", // ARG vs ALG
+    "2026-06-17T04:00:00Z", // AUT vs JOR
+    "2026-06-22T17:00:00Z", // ARG vs AUT
+    "2026-06-23T03:00:00Z", // ALG vs JOR
+    "2026-06-28T02:00:00Z", // ARG vs JOR
+    "2026-06-28T02:00:00Z", // ALG vs AUT
   ],
   "Gruppe K": [
-    "2026-06-17T21:00:00Z", // POR vs COD (Wed Jun 17, 17:00 CDT)
-    "2026-06-18T06:00:00Z", // UZB vs COL (Thu Jun 18, 02:00 CST)
-    "2026-06-23T21:00:00Z", // POR vs UZB (Tue Jun 23, 17:00 CDT)
-    "2026-06-24T06:00:00Z", // COL vs COD (Wed Jun 24, 02:00 CST)
-    "2026-06-28T03:30:00Z", // COL vs POR (Sat Jun 27, 23:30 EDT)
-    "2026-06-28T03:30:00Z", // COD vs UZB (Sat Jun 27, 23:30 EDT)
+    "2026-06-17T17:00:00Z", // POR vs COD
+    "2026-06-18T02:00:00Z", // UZB vs COL
+    "2026-06-23T17:00:00Z", // POR vs UZB
+    "2026-06-24T02:00:00Z", // COD vs COL
+    "2026-06-28T03:30:00Z", // POR vs COL
+    "2026-06-28T03:30:00Z", // COD vs UZB
   ],
   "Gruppe L": [
-    "2026-06-18T00:00:00Z", // ENG vs CRO (Wed Jun 17, 20:00 CDT)
-    "2026-06-18T03:00:00Z", // GHA vs PAN (Wed Jun 17, 23:00 EDT)
-    "2026-06-24T00:00:00Z", // ENG vs GHA (Tue Jun 23, 20:00 EDT)
-    "2026-06-24T03:00:00Z", // PAN vs CRO (Tue Jun 23, 23:00 EDT)
-    "2026-06-28T01:00:00Z", // PAN vs ENG (Sat Jun 27, 21:00 EDT)
-    "2026-06-28T01:00:00Z", // CRO vs GHA (Sat Jun 27, 21:00 EDT)
+    "2026-06-17T20:00:00Z", // ENG vs CRO
+    "2026-06-17T23:00:00Z", // GHA vs PAN
+    "2026-06-23T20:00:00Z", // ENG vs GHA
+    "2026-06-23T23:00:00Z", // CRO vs PAN
+    "2026-06-27T21:00:00Z", // ENG vs PAN
+    "2026-06-27T21:00:00Z", // CRO vs GHA
   ],
 };
 
-// UTC times for knockout matches
+// UTC times for knockout matches (matchNumber order 73-104)
 const KNOCKOUT_MATCHES = [
   // Round of 32 (Jun 28 - Jul 4)
   { stage: Stage.ROUND_OF_32, time: "2026-06-29T02:00:00Z" },  // #73
-  { stage: Stage.ROUND_OF_32, time: "2026-06-29T21:00:00Z" },  // #76
   { stage: Stage.ROUND_OF_32, time: "2026-06-30T00:30:00Z" },  // #74
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T05:00:00Z" },  // #75
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T21:00:00Z" },  // #78
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T07:00:00Z" },  // #75
+  { stage: Stage.ROUND_OF_32, time: "2026-06-29T22:00:00Z" },  // #76
   { stage: Stage.ROUND_OF_32, time: "2026-07-01T01:00:00Z" },  // #77
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T05:00:00Z" },  // #79
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T22:00:00Z" },  // #78
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T07:00:00Z" },  // #79
   { stage: Stage.ROUND_OF_32, time: "2026-07-01T20:00:00Z" },  // #80
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T00:00:00Z" },  // #82
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T04:00:00Z" },  // #81
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T23:00:00Z" },  // #84
+  { stage: Stage.ROUND_OF_32, time: "2026-07-02T03:00:00Z" },  // #82
+  { stage: Stage.ROUND_OF_32, time: "2026-07-02T07:00:00Z" },  // #81
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T02:00:00Z" },  // #84
   { stage: Stage.ROUND_OF_32, time: "2026-07-03T03:00:00Z" },  // #83
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T07:00:00Z" },  // #85
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T22:00:00Z" },  // #88
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T10:00:00Z" },  // #85
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T23:00:00Z" },  // #88
   { stage: Stage.ROUND_OF_32, time: "2026-07-04T02:00:00Z" },  // #86
-  { stage: Stage.ROUND_OF_32, time: "2026-07-04T05:30:00Z" },  // #87
+  { stage: Stage.ROUND_OF_32, time: "2026-07-04T06:30:00Z" },  // #87
   // Round of 16 (Jul 4 - Jul 7)
-  { stage: Stage.ROUND_OF_16, time: "2026-07-04T21:00:00Z" },  // #90
+  { stage: Stage.ROUND_OF_16, time: "2026-07-04T22:00:00Z" },  // #90
   { stage: Stage.ROUND_OF_16, time: "2026-07-05T01:00:00Z" },  // #89
   { stage: Stage.ROUND_OF_16, time: "2026-07-06T00:00:00Z" },  // #91
-  { stage: Stage.ROUND_OF_16, time: "2026-07-06T04:00:00Z" },  // #92
-  { stage: Stage.ROUND_OF_16, time: "2026-07-06T23:00:00Z" },  // #93
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T04:00:00Z" },  // #94
+  { stage: Stage.ROUND_OF_16, time: "2026-07-06T06:00:00Z" },  // #92
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T00:00:00Z" },  // #93
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T07:00:00Z" },  // #94
   { stage: Stage.ROUND_OF_16, time: "2026-07-07T20:00:00Z" },  // #95
-  { stage: Stage.ROUND_OF_16, time: "2026-07-08T00:00:00Z" },  // #96
+  { stage: Stage.ROUND_OF_16, time: "2026-07-08T03:00:00Z" },  // #96
   // Quarter-finals (Jul 9 - Jul 12)
   { stage: Stage.QUARTER_FINALS, time: "2026-07-10T00:00:00Z" },  // #97
   { stage: Stage.QUARTER_FINALS, time: "2026-07-11T02:00:00Z" },  // #98
   { stage: Stage.QUARTER_FINALS, time: "2026-07-12T01:00:00Z" },  // #99
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T05:00:00Z" },  // #100
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T06:00:00Z" },  // #100
   // Semi-finals (Jul 14 - Jul 15)
-  { stage: Stage.SEMI_FINALS, time: "2026-07-14T23:00:00Z" },  // #101
+  { stage: Stage.SEMI_FINALS, time: "2026-07-15T00:00:00Z" },  // #101
   { stage: Stage.SEMI_FINALS, time: "2026-07-15T23:00:00Z" },  // #102
   // Third place (Jul 18)
   { stage: Stage.THIRD_PLACE, time: "2026-07-19T01:00:00Z" },  // #103
