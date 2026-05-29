@@ -230,7 +230,7 @@ export default function MatchList({ userId }: { userId: string }) {
                       {new Date(match.matchDate).toLocaleTimeString("de-DE", {
                         hour: "2-digit",
                         minute: "2-digit",
-                      })}
+                      })} Uhr
                     </div>
 
                     {/* Teams + Score */}
