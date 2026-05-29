@@ -27,27 +27,27 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-3.5rem)]">
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/10 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-[#D40000]/5 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-950" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/5 via-transparent to-transparent dark:from-[#D40000]/10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-[#D40000]/3 via-transparent to-transparent dark:from-[#D40000]/5" />
 
       <div className="relative z-10 container mx-auto py-10 px-4">
         <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-           {" "}
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white">
+            {" "}
             <span className="bg-gradient-to-r from-red-300 via-[#D40000] to-red-700 bg-clip-text text-transparent">
               Rangliste
             </span>
           </h1>
-          <p className="text-zinc-400 mt-2">
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">
             Wer hat die besten Tipps bei der WM 2026?
           </p>
         </div>
 
         {leaderboard.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-12 text-center">
+          <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm p-12 text-center">
             <div className="text-5xl mb-4">🏆</div>
-            <p className="text-lg font-medium text-white">Noch keine Punkte vergeben.</p>
+            <p className="text-lg font-medium text-zinc-900 dark:text-white">Noch keine Punkte vergeben.</p>
             <p className="text-sm text-zinc-500 mt-1">
               Sobald Spiele beendet sind und Ergebnisse eingetragen wurden, erscheint hier die Rangliste.
             </p>
@@ -59,14 +59,14 @@ export default async function LeaderboardPage() {
               <div className="flex items-end justify-center gap-4 sm:gap-6 py-8">
                 {/* 2nd */}
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-500 flex items-center justify-center text-2xl font-bold text-zinc-800 ring-2 ring-zinc-400/50">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-500 dark:from-zinc-300 dark:to-zinc-500 flex items-center justify-center text-2xl font-bold text-zinc-800 ring-2 ring-zinc-400/50">
                     {leaderboard[1]?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-center">
-                    <div className="text-sm font-semibold text-zinc-200">{leaderboard[1]?.name}</div>
+                    <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{leaderboard[1]?.name}</div>
                     <div className="text-xs text-zinc-500 mt-0.5">{leaderboard[1]?.points} Punkte</div>
                   </div>
-                  <div className="w-24 h-16 rounded-t-xl bg-gradient-to-b from-zinc-400/20 to-zinc-600/20 border border-zinc-500/20 flex items-center justify-center text-3xl backdrop-blur-sm">
+                  <div className="w-24 h-16 rounded-t-xl bg-gradient-to-b from-zinc-200 to-zinc-300 dark:from-zinc-400/20 dark:to-zinc-600/20 border border-zinc-300 dark:border-zinc-500/20 flex items-center justify-center text-3xl">
                     🥈
                   </div>
                 </div>
@@ -76,10 +76,10 @@ export default async function LeaderboardPage() {
                     {leaderboard[0]?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-center">
-                    <div className="text-sm font-bold text-white">{leaderboard[0]?.name}</div>
-                    <div className="text-xs text-yellow-500 font-medium mt-0.5">{leaderboard[0]?.points} Punkte</div>
+                    <div className="text-sm font-bold text-zinc-900 dark:text-white">{leaderboard[0]?.name}</div>
+                    <div className="text-xs text-yellow-600 dark:text-yellow-500 font-medium mt-0.5">{leaderboard[0]?.points} Punkte</div>
                   </div>
-                  <div className="w-28 h-20 rounded-t-xl bg-gradient-to-b from-yellow-400/20 to-yellow-600/20 border border-yellow-500/20 flex items-center justify-center text-4xl backdrop-blur-sm shadow-lg shadow-yellow-500/10">
+                  <div className="w-28 h-20 rounded-t-xl bg-gradient-to-b from-yellow-200 to-yellow-300 dark:from-yellow-400/20 dark:to-yellow-600/20 border border-yellow-300 dark:border-yellow-500/20 flex items-center justify-center text-4xl shadow-lg shadow-yellow-500/10">
                     🥇
                   </div>
                 </div>
@@ -89,10 +89,10 @@ export default async function LeaderboardPage() {
                     {leaderboard[2]?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-center">
-                    <div className="text-sm font-semibold text-zinc-200">{leaderboard[2]?.name}</div>
+                    <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{leaderboard[2]?.name}</div>
                     <div className="text-xs text-zinc-500 mt-0.5">{leaderboard[2]?.points} Punkte</div>
                   </div>
-                  <div className="w-24 h-12 rounded-t-xl bg-gradient-to-b from-orange-400/20 to-orange-600/20 border border-orange-500/20 flex items-center justify-center text-3xl backdrop-blur-sm">
+                  <div className="w-24 h-12 rounded-t-xl bg-gradient-to-b from-orange-200 to-orange-300 dark:from-orange-400/20 dark:to-orange-600/20 border border-orange-300 dark:border-orange-500/20 flex items-center justify-center text-3xl">
                     🥉
                   </div>
                 </div>
@@ -100,20 +100,20 @@ export default async function LeaderboardPage() {
             )}
 
             {/* Full Ranking */}
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-white/5">
+            <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/5">
                 <div className="grid grid-cols-12 gap-4 text-xs font-medium text-zinc-500 uppercase tracking-wider">
                   <div className="col-span-2 text-center">#</div>
                   <div className="col-span-6">Name</div>
                   <div className="col-span-4 text-center">Punkte</div>
                 </div>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-zinc-100 dark:divide-white/5">
                 {leaderboard.map((entry) => {
                   const isCurrentUser = entry.userId === session.user.id;
                   const rankStyles: Record<number, string> = {
-                    1: "text-yellow-400",
-                    2: "text-zinc-300",
+                    1: "text-yellow-500",
+                    2: "text-zinc-400",
                     3: "text-orange-400",
                   };
 
@@ -122,29 +122,29 @@ export default async function LeaderboardPage() {
                       key={entry.userId}
                       className={`px-6 py-3.5 transition-colors ${
                         isCurrentUser
-                          ? "bg-[#D40000]/10 border-l-2 border-l-[#D40000]"
-                          : "hover:bg-white/[0.02] border-l-2 border-l-transparent"
+                          ? "bg-[#D40000]/5 dark:bg-[#D40000]/10 border-l-2 border-l-[#D40000]"
+                          : "hover:bg-zinc-50 dark:hover:bg-white/[0.02] border-l-2 border-l-transparent"
                       }`}
                     >
                       <div className="grid grid-cols-12 gap-4 items-center">
                         <div className="col-span-2 text-center">
-                          <span className={`font-bold text-lg ${rankStyles[entry.rank] || "text-zinc-500"}`}>
+                          <span className={`font-bold text-lg ${rankStyles[entry.rank] || "text-zinc-400 dark:text-zinc-500"}`}>
                             {entry.rank <= 3 ? (entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : "🥉") : entry.rank}
                           </span>
                         </div>
                         <div className="col-span-6 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-300">
+                          <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">
                             {entry.name.charAt(0).toUpperCase()}
                           </div>
-                          <span className="font-medium text-zinc-200">{entry.name}</span>
+                          <span className="font-medium text-zinc-800 dark:text-zinc-200">{entry.name}</span>
                           {isCurrentUser && (
-                            <span className="text-xs bg-[#D40000]/20 text-[#D40000] px-2 py-0.5 rounded-full font-medium border border-[#D40000]/30">
+                            <span className="text-xs bg-[#D40000]/10 dark:bg-[#D40000]/20 text-[#D40000] px-2 py-0.5 rounded-full font-medium border border-[#D40000]/20 dark:border-[#D40000]/30">
                               Du
                             </span>
                           )}
                         </div>
                         <div className="col-span-4 text-center">
-                          <span className="font-bold text-lg text-white">{entry.points}</span>
+                          <span className="font-bold text-lg text-zinc-900 dark:text-white">{entry.points}</span>
                           <span className="text-xs text-zinc-500 ml-1">Pkt.</span>
                         </div>
                       </div>
@@ -155,7 +155,7 @@ export default async function LeaderboardPage() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-center gap-2 text-sm text-zinc-600">
+            <div className="flex items-center justify-center gap-2 text-sm text-zinc-400 dark:text-zinc-600">
               <span>{leaderboard.length} Teilnehmer</span>
             </div>
           </div>

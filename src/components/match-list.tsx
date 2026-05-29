@@ -153,15 +153,15 @@ export default function MatchList({ userId }: { userId: string }) {
       case "final":
         return <Badge className="bg-yellow-500 text-black hover:bg-yellow-600">{label}</Badge>;
       case "semi_finals":
-        return <Badge className="border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-300">{label}</Badge>;
+        return <Badge className="border-violet-300 dark:border-violet-700 bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300">{label}</Badge>;
       case "quarter_finals":
-        return <Badge className="border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">{label}</Badge>;
+        return <Badge className="border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">{label}</Badge>;
       case "round_of_16":
-        return <Badge className="border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300">{label}</Badge>;
+        return <Badge className="border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">{label}</Badge>;
       case "round_of_32":
-        return <Badge className="border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-300">{label}</Badge>;
+        return <Badge className="border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300">{label}</Badge>;
       case "third_place":
-        return <Badge className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300">{label}</Badge>;
+        return <Badge className="border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300">{label}</Badge>;
       case "group":
         return <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800">{label}</Badge>;
       default:
@@ -172,8 +172,8 @@ export default function MatchList({ userId }: { userId: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-400">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-600 border-t-zinc-300" />
+        <div className="flex items-center gap-3 text-zinc-500">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-600 dark:border-t-zinc-300" />
           Lade Spiele...
         </div>
       </div>
@@ -190,7 +190,7 @@ export default function MatchList({ userId }: { userId: string }) {
   return (
     <div className="space-y-10">
       {errorMessage && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 backdrop-blur-sm px-5 py-3 text-sm text-red-300">
+        <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-5 py-3 text-sm text-red-600 dark:text-red-300">
           {errorMessage}
         </div>
       )}
@@ -198,13 +198,13 @@ export default function MatchList({ userId }: { userId: string }) {
       {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
         <div key={groupName}>
           <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-lg font-bold text-white">{getStageLabel(groupName)}</h2>
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{getStageLabel(groupName)}</h2>
             {groupMatches.length > 1 && (
-              <Badge variant="outline" className="border-white/10 text-zinc-400">{groupMatches.length} Spiele</Badge>
+              <Badge variant="outline" className="border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400">{groupMatches.length} Spiele</Badge>
             )}
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm divide-y divide-white/5 overflow-hidden">
+          <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm divide-y divide-zinc-100 dark:divide-white/5 overflow-hidden">
             {groupMatches.map((match) => {
               const isSaved = savedIds.has(match.id);
               const isJustSaved = justSavedIds.has(match.id);
@@ -219,9 +219,9 @@ export default function MatchList({ userId }: { userId: string }) {
 
               return (
                 <div key={match.id}>
-                  <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.03] transition-colors">
+                  <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors">
                     {/* Datum */}
-                    <div className="flex-shrink-0 w-24 text-xs text-zinc-500 font-medium">
+                    <div className="flex-shrink-0 w-24 text-xs text-zinc-400 font-medium">
                       {new Date(match.matchDate).toLocaleDateString("de-DE", {
                         day: "2-digit",
                         month: "2-digit",
@@ -235,7 +235,7 @@ export default function MatchList({ userId }: { userId: string }) {
 
                     {/* Teams + Score */}
                     <div className="flex items-center gap-3 flex-1 justify-center">
-                      <span className={`font-medium text-right w-32 truncate flex items-center justify-end gap-2 text-sm ${!match.hasTeams ? "text-zinc-600" : "text-zinc-200"}`}>
+                      <span className={`font-medium text-right w-32 truncate flex items-center justify-end gap-2 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
                         <span>{match.hasTeams ? match.homeTeam : "???"}</span>
                         {match.homeTeamCode && (
                           <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
@@ -248,29 +248,29 @@ export default function MatchList({ userId }: { userId: string }) {
                             type="number"
                             min="0"
                             max="99"
-                            className="w-12 h-9 text-center text-sm px-1 bg-white/5 border-white/10 text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                            className="w-12 h-9 text-center text-sm px-1 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
                             value={predictions[match.id]?.home ?? ""}
                             placeholder="-"
                             onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
                           />
-                          <span className="text-zinc-600 font-bold">:</span>
+                          <span className="text-zinc-300 dark:text-zinc-600 font-bold">:</span>
                           <Input
                             type="number"
                             min="0"
                             max="99"
-                            className="w-12 h-9 text-center text-sm px-1 bg-white/5 border-white/10 text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                            className="w-12 h-9 text-center text-sm px-1 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
                             value={predictions[match.id]?.away ?? ""}
                             placeholder="-"
                             onChange={(e) => handlePredictionChange(match.id, "away", e.target.value)}
                           />
                         </div>
                       ) : (
-                        <div className="text-xs text-zinc-600 italic text-center px-2">
+                        <div className="text-xs text-zinc-400 dark:text-zinc-600 italic text-center px-2">
                           Teams noch nicht bekannt
                         </div>
                       )}
 
-                      <span className={`font-medium w-32 truncate flex items-center gap-2 text-sm ${!match.hasTeams ? "text-zinc-600" : "text-zinc-200"}`}>
+                      <span className={`font-medium w-32 truncate flex items-center gap-2 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
                         {match.awayTeamCode && (
                           <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
                         )}
@@ -286,13 +286,13 @@ export default function MatchList({ userId }: { userId: string }) {
                           size="sm"
                           variant="outline"
                           onClick={() => handleToggleTips(match.id)}
-                          className="text-xs border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white"
+                          className="text-xs border-zinc-200 dark:border-white/10 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5 dark:text-zinc-400 dark:hover:text-white"
                         >
                           {isLoadingTips ? "..." : isExpanded ? "Schließen" : "Tipps"}
                         </Button>
                       )}
                       {isMatchLocked ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium bg-white/5 text-zinc-500 cursor-default border border-white/5">
+                        <span className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 cursor-default border border-zinc-200 dark:border-white/5">
                           🔒 Beendet
                         </span>
                       ) : (
@@ -304,7 +304,7 @@ export default function MatchList({ userId }: { userId: string }) {
                             isJustSaved
                               ? "bg-green-600 hover:bg-green-700 text-white"
                               : isSaved
-                                ? "bg-white/10 hover:bg-white/15 text-zinc-300"
+                                ? "bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-300"
                                 : "bg-[#D40000] hover:bg-[#B00000] text-white"
                           }
                         >
@@ -316,7 +316,7 @@ export default function MatchList({ userId }: { userId: string }) {
 
                   {/* Ausgeklappte Tipps-Liste */}
                   {isExpanded && tips && (
-                    <div className="border-t border-white/5 bg-white/[0.02] px-4 py-3">
+                    <div className="border-t border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02] px-4 py-3">
                       <div className="text-xs font-medium text-zinc-500 mb-2">Tipps aller Teilnehmer</div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5">
                         {tips.map((tip) => {
@@ -327,16 +327,16 @@ export default function MatchList({ userId }: { userId: string }) {
                               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs border ${
                                 isOwn
                                   ? "bg-[#D40000]/10 border-[#D40000]/30"
-                                  : "bg-white/[0.03] border-white/5"
+                                  : "bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/5"
                               }`}
                             >
-                              <span className="font-medium truncate flex-1 text-zinc-300">
+                              <span className="font-medium truncate flex-1 text-zinc-700 dark:text-zinc-300">
                                 {tip.name}
                                 {isOwn && (
                                   <span className="text-[#D40000] ml-1 font-bold">(Du)</span>
                                 )}
                               </span>
-                              <span className="font-mono font-bold tabular-nums text-zinc-200">
+                              <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-200">
                                 {tip.homeScore}:{tip.awayScore}
                               </span>
                             </div>
@@ -355,7 +355,7 @@ export default function MatchList({ userId }: { userId: string }) {
       {matches.length === 0 && (
         <div className="text-center py-20">
           <div className="text-5xl mb-4">⚽</div>
-          <p className="text-lg font-medium text-white">Noch keine Spiele verfügbar.</p>
+          <p className="text-lg font-medium text-zinc-900 dark:text-white">Noch keine Spiele verfügbar.</p>
           <p className="text-sm text-zinc-500 mt-1">Die WM startet bald!</p>
         </div>
       )}

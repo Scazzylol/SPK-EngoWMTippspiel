@@ -26,15 +26,15 @@ function getStageBadge(stage: string) {
     case "final":
       return <Badge className="bg-yellow-500 text-black">{label}</Badge>;
     case "semi_finals":
-      return <Badge className="border-violet-500/30 bg-violet-500/10 text-violet-300">{label}</Badge>;
+      return <Badge className="border-violet-300 dark:border-violet-700 bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300">{label}</Badge>;
     case "quarter_finals":
-      return <Badge className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300">{label}</Badge>;
+      return <Badge className="border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">{label}</Badge>;
     case "round_of_16":
-      return <Badge className="border-blue-500/30 bg-blue-500/10 text-blue-300">{label}</Badge>;
+      return <Badge className="border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">{label}</Badge>;
     case "round_of_32":
-      return <Badge className="border-sky-500/30 bg-sky-500/10 text-sky-300">{label}</Badge>;
+      return <Badge className="border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300">{label}</Badge>;
     case "third_place":
-      return <Badge className="border-orange-500/30 bg-orange-500/10 text-orange-300">{label}</Badge>;
+      return <Badge className="border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300">{label}</Badge>;
     case "group":
       return <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800">{label}</Badge>;
     default:
@@ -144,10 +144,10 @@ export default function AdminPage() {
   if (loading) {
     return (
       <div className="relative min-h-[calc(100vh-3.5rem)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-950" />
         <div className="relative z-10 flex items-center justify-center py-20">
-          <div className="flex items-center gap-3 text-zinc-400">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-600 border-t-zinc-300" />
+          <div className="flex items-center gap-3 text-zinc-500">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-600 dark:border-t-zinc-300" />
             Lade Admin-Panel...
           </div>
         </div>
@@ -158,11 +158,11 @@ export default function AdminPage() {
   if (!authorized) {
     return (
       <div className="relative min-h-[calc(100vh-3.5rem)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-950" />
         <div className="relative z-10 flex items-center justify-center py-20">
-          <div className="rounded-xl border border-red-500/20 bg-red-500/10 backdrop-blur-sm px-8 py-12 text-center">
-            <h1 className="text-xl font-bold text-red-400 mb-2">Kein Zugriff</h1>
-            <p className="text-zinc-400">Du hast keine Admin-Rechte.</p>
+          <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 backdrop-blur-sm px-8 py-12 text-center">
+            <h1 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Kein Zugriff</h1>
+            <p className="text-zinc-500 dark:text-zinc-400">Du hast keine Admin-Rechte.</p>
           </div>
         </div>
       </div>
@@ -181,18 +181,18 @@ export default function AdminPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-3.5rem)]">
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-950" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/5 via-transparent to-transparent dark:from-[#D40000]/10" />
 
       <div className="relative z-10 container mx-auto py-10 px-4">
         <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white">
             Admin{" "}
             <span className="bg-gradient-to-r from-red-300 via-[#D40000] to-red-700 bg-clip-text text-transparent">
               Panel
             </span>
           </h1>
-          <p className="text-zinc-400 mt-2">
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">
             Spiele verwalten und Ergebnisse eintragen
           </p>
         </div>
@@ -201,18 +201,18 @@ export default function AdminPage() {
           <div
             className={`mb-6 rounded-xl border backdrop-blur-sm px-5 py-3 text-sm ${
               message.type === "success"
-                ? "border-green-500/20 bg-green-500/10 text-green-300"
-                : "border-red-500/20 bg-red-500/10 text-red-300"
+                ? "border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300"
+                : "border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-300"
             }`}
           >
             {message.text}
           </div>
         )}
 
-        <div className="mb-8 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5">
+        <div className="mb-8 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm p-5">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-sm text-white">KO-Phase berechnen</h3>
+              <h3 className="font-semibold text-sm text-zinc-900 dark:text-white">KO-Phase berechnen</h3>
               <p className="text-xs text-zinc-500 mt-1">
                 Nachdem alle Gruppenspiele Ergebnisse haben, werden hier die Achtelfinal-Paarungen nach FIFA-2026-Regel berechnet
               </p>
@@ -220,7 +220,7 @@ export default function AdminPage() {
             <Button
               onClick={handleCalculateKnockout}
               disabled={calculatingKo}
-              className="bg-white/10 hover:bg-white/15 text-white border border-white/10"
+              className="bg-zinc-900 dark:bg-white/10 hover:bg-zinc-700 dark:hover:bg-white/15 text-white"
             >
               {calculatingKo ? "Berechne..." : "KO-Phase berechnen"}
             </Button>
@@ -231,16 +231,16 @@ export default function AdminPage() {
           {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
             <div key={groupName}>
               <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-lg font-bold text-white">{getStageLabel(groupName)}</h2>
-                <Badge variant="outline" className="border-white/10 text-zinc-400">
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{getStageLabel(groupName)}</h2>
+                <Badge variant="outline" className="border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400">
                   {groupMatches.length} Spiele
                 </Badge>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden">
+              <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-zinc-100 dark:border-white/5">
                       <th className="text-left px-4 py-3 font-medium text-zinc-500 w-32">Datum</th>
                       <th className="text-left px-4 py-3 font-medium text-zinc-500">Spiel</th>
                       <th className="text-center px-4 py-3 font-medium text-zinc-500 w-40">Ergebnis</th>
@@ -248,7 +248,7 @@ export default function AdminPage() {
                       <th className="text-right px-4 py-3 font-medium text-zinc-500 w-32">Aktion</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-zinc-100 dark:divide-white/5">
                     {groupMatches.map((match) => {
                       const isSaving = savingId === match.id;
                       const hasScore =
@@ -257,9 +257,9 @@ export default function AdminPage() {
                       return (
                         <tr
                           key={match.id}
-                          className="hover:bg-white/[0.03] transition-colors"
+                          className="hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors"
                         >
-                          <td className="px-4 py-3 text-xs text-zinc-500">
+                          <td className="px-4 py-3 text-xs text-zinc-400">
                             {new Date(match.startTime).toLocaleDateString("de-DE", {
                               day: "2-digit",
                               month: "2-digit",
@@ -272,9 +272,9 @@ export default function AdminPage() {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-zinc-200">{match.homeTeam}</span>
-                              <span className="text-zinc-600">–</span>
-                              <span className="font-medium text-zinc-200">{match.awayTeam}</span>
+                              <span className="font-medium text-zinc-800 dark:text-zinc-200">{match.homeTeam}</span>
+                              <span className="text-zinc-300 dark:text-zinc-600">–</span>
+                              <span className="font-medium text-zinc-800 dark:text-zinc-200">{match.awayTeam}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3">
@@ -283,7 +283,7 @@ export default function AdminPage() {
                                 type="number"
                                 min="0"
                                 max="99"
-                                className="w-12 h-8 text-center text-sm px-1 bg-white/5 border-white/10 text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                                className="w-12 h-8 text-center text-sm px-1 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
                                 value={scores[match.id]?.home ?? ""}
                                 placeholder="-"
                                 onChange={(e) =>
@@ -293,12 +293,12 @@ export default function AdminPage() {
                                   }))
                                 }
                               />
-                              <span className="text-zinc-600 font-bold">:</span>
+                              <span className="text-zinc-300 dark:text-zinc-600 font-bold">:</span>
                               <Input
                                 type="number"
                                 min="0"
                                 max="99"
-                                className="w-12 h-8 text-center text-sm px-1 bg-white/5 border-white/10 text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                                className="w-12 h-8 text-center text-sm px-1 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
                                 value={scores[match.id]?.away ?? ""}
                                 placeholder="-"
                                 onChange={(e) =>
@@ -315,8 +315,8 @@ export default function AdminPage() {
                               onClick={() => handleToggleLock(match.id)}
                               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                                 match.isLocked
-                                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                                  : "bg-green-500/10 text-green-400 border border-green-500/20"
+                                  ? "bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20"
+                                  : "bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-500/20"
                               }`}
                             >
                               <span
@@ -336,7 +336,7 @@ export default function AdminPage() {
                                 justSavedIds.has(match.id)
                                   ? "bg-green-600 hover:bg-green-700 text-white"
                                   : savedIds.has(match.id)
-                                    ? "bg-white/10 hover:bg-white/15 text-zinc-300"
+                                    ? "bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-300"
                                     : "bg-[#D40000] hover:bg-[#B00000] text-white"
                               }
                             >
