@@ -1,24 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
-import { cookies } from "next/headers";
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get("better-auth.session_token")?.value;
-  let user = null;
-
-  if (sessionToken) {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/get-session`,
-      {
-        headers: { Cookie: `better-auth.session_token=${sessionToken}` },
-        cache: "no-store",
-      }
-    );
-    const data = await response.json();
-    user = data?.user;
-  }
+  const session = await getSession();
+  const user = session?.user ?? null;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-zinc-50 dark:bg-black px-4">

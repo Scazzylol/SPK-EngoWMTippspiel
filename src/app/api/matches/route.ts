@@ -1,7 +1,31 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+import { sql } from "@/lib/db-singleton";
 
-const sql = postgres(process.env.DATABASE_URL!, { prepare: false });
+interface MatchRow {
+  id: string;
+  hometeamname: string;
+  hometeamcode: string | null;
+  hometeamflag: string | null;
+  awayteamname: string;
+  awayteamcode: string | null;
+  awayteamflag: string | null;
+  matchdate: Date;
+  groupname: string | null;
+  stage: string;
+}
+
+interface MatchResponse {
+  id: string;
+  homeTeam: string;
+  homeTeamCode: string | null;
+  homeTeamFlag: string | null;
+  awayTeam: string;
+  awayTeamCode: string | null;
+  awayTeamFlag: string | null;
+  matchDate: string;
+  groupName: string | null;
+  stage: string;
+}
 
 function normalizeStage(stage: string): string {
   const map: Record<string, string> = {
@@ -18,11 +42,15 @@ function normalizeStage(stage: string): string {
 
 export async function GET() {
   try {
-    const rows = await sql`
+    const rows = await sql<MatchRow[]>`
       SELECT 
         m.id,
         home.name AS homeTeamName,
+        home.code AS homeTeamCode,
+        home."flagEmoji" AS homeTeamFlag,
         away.name AS awayTeamName,
+        away.code AS awayTeamCode,
+        away."flagEmoji" AS awayTeamFlag,
         m."startTime" AS matchDate,
         g.name AS groupName,
         m.stage
@@ -33,12 +61,16 @@ export async function GET() {
       ORDER BY m."startTime", m."matchNumber"
     `;
 
-    const matches = rows.map((row: any) => ({
+    const matches: MatchResponse[] = rows.map((row) => ({
       id: row.id,
       homeTeam: row.hometeamname || "TBD",
+      homeTeamCode: row.hometeamcode || null,
+      homeTeamFlag: row.hometeamflag || null,
       awayTeam: row.awayteamname || "TBD",
-      matchDate: row.matchdate,
-      groupName: row.groupname,
+      awayTeamCode: row.awayteamcode || null,
+      awayTeamFlag: row.awayteamflag || null,
+      matchDate: row.matchdate.toISOString(),
+      groupName: row.groupname || null,
       stage: normalizeStage(row.stage),
     }));
 

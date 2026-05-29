@@ -7,17 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String?
-  image     String?
-  password  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  predictions Prediction[]
-}
-
 model Team {
   id          String   @id @default(cuid())
   name        String
@@ -31,11 +20,11 @@ model Team {
 }
 
 model Group {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  teams       Team[]
-  matches     Match[]
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String   @unique
+  teams     Team[]
+  matches   Match[]
+  createdAt DateTime @default(now())
 }
 
 model Match {
@@ -55,20 +44,17 @@ model Match {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   predictions   Prediction[]
-
- 
 }
 
 model Prediction {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  matchId    String
-  match      Match    @relation(fields: [matchId], references: [id])
-  homeGoals  Int
-  awayGoals  Int
-  points     Int?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  matchId   String
+  match     Match    @relation(fields: [matchId], references: [id])
+  homeScore Int
+  awayScore Int
+  points    Int?
+  createdAt DateTime @default(now())
 
   @@unique([userId, matchId])
 }
@@ -79,6 +65,6 @@ enum Stage {
   ROUND_OF_16
   QUARTER_FINALS
   SEMI_FINALS
-  FINAL
   THIRD_PLACE
+  FINAL
 }

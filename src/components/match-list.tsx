@@ -1,16 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getStageLabel } from "@/lib/stage-labels";
+import { getFlagUrl } from "@/lib/flags";
+import { savePrediction } from "@/actions/predictions";
 
 interface Match {
   id: string;
   homeTeam: string;
+  homeTeamCode: string | null;
+  homeTeamFlag: string | null;
   awayTeam: string;
+  awayTeamCode: string | null;
+  awayTeamFlag: string | null;
   matchDate: string;
-  group?: string;
+  groupName?: string;
   stage: string;
 }
 
@@ -20,13 +27,9 @@ export default function MatchList({ userId }: { userId: string }) {
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchMatches();
-    fetchPredictions();
-  }, []);
-
-  const fetchMatches = async () => {
+  const fetchMatches = useCallback(async () => {
     try {
       const res = await fetch("/api/matches");
       if (res.ok) {
@@ -38,25 +41,31 @@ export default function MatchList({ userId }: { userId: string }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchPredictions = async () => {
+  const fetchPredictions = useCallback(async () => {
     try {
       const res = await fetch(`/api/predictions?userId=${userId}`);
       if (res.ok) {
         const data = await res.json();
         const predMap: { [key: string]: { home: string; away: string } } = {};
+        const ids = new Set<string>();
         for (const p of data) {
           predMap[p.matchId] = { home: String(p.homeScore), away: String(p.awayScore) };
-          savedIds.add(p.matchId);
+          ids.add(p.matchId);
         }
         setPredictions(predMap);
-        setSavedIds(new Set(savedIds));
+        setSavedIds(ids);
       }
     } catch (error) {
       console.error("Failed to fetch predictions:", error);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchMatches();
+    fetchPredictions();
+  }, [fetchMatches, fetchPredictions]);
 
   const handlePredictionChange = (matchId: string, field: "home" | "away", value: string) => {
     setPredictions((prev) => ({
@@ -68,49 +77,30 @@ export default function MatchList({ userId }: { userId: string }) {
     }));
   };
 
-  const savePrediction = async (matchId: string) => {
+  const handleSave = async (matchId: string) => {
     const pred = predictions[matchId];
     if (!pred || pred.home === "" || pred.away === "") return;
 
     setSavingId(matchId);
-    try {
-      await fetch("/api/predictions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          matchId,
-          homeScore: parseInt(pred.home),
-          awayScore: parseInt(pred.away),
-        }),
-      });
-    } catch (error) {
-      console.error("Failed to save prediction:", error);
-    } finally {
+    setErrorMessage(null);
+    const result = await savePrediction(matchId, parseInt(pred.home), parseInt(pred.away));
+    if (result?.error) {
+      setErrorMessage(result.error);
+    } else {
       setSavedIds((prev) => new Set(prev).add(matchId));
-      setSavingId(null);
     }
+    setSavingId(null);
   };
 
   const getStageBadge = (stage: string) => {
-    switch (stage) {
-      case "group":
-        return <Badge variant="secondary">Gruppenphase</Badge>;
-      case "round_of_32":
-        return <Badge variant="outline">Achtelfinale (32)</Badge>;
-      case "round_of_16":
-        return <Badge>Achtelfinale</Badge>;
-      case "quarter_finals":
-        return <Badge>Viertelfinale</Badge>;
-      case "semi_finals":
-        return <Badge>Halbfinale</Badge>;
-      case "third_place":
-        return <Badge>Spiel um Platz 3</Badge>;
-      case "final":
-        return <Badge className="bg-yellow-500 text-black">Finale</Badge>;
-      default:
-        return <Badge>{stage}</Badge>;
+    const label = getStageLabel(stage);
+    if (stage === "final") {
+      return <Badge className="bg-yellow-500 text-black">{label}</Badge>;
     }
+    if (stage === "group") {
+      return <Badge variant="secondary">{label}</Badge>;
+    }
+    return <Badge>{label}</Badge>;
   };
 
   if (loading) {
@@ -130,9 +120,15 @@ export default function MatchList({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-8">
+      {errorMessage && (
+        <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+          {errorMessage}
+        </div>
+      )}
+
       {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
         <div key={groupName}>
-          <h2 className="text-xl font-semibold mb-3">{groupName}</h2>
+          <h2 className="text-xl font-semibold mb-3">{getStageLabel(groupName)}</h2>
           <div className="space-y-2">
             {groupMatches.map((match) => (
               <div
@@ -149,7 +145,12 @@ export default function MatchList({ userId }: { userId: string }) {
                 </div>
 
                 <div className="flex items-center gap-3 flex-1">
-                  <span className="font-medium text-right w-28">{match.homeTeam}</span>
+                  <span className="font-medium text-right w-28 truncate flex items-center justify-end gap-1.5">
+                    <span>{match.homeTeam}</span>
+                    {match.homeTeamCode && (
+                      <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain inline-block" />
+                    )}
+                  </span>
 
                   <div className="flex items-center gap-1">
                     <Input
@@ -173,14 +174,19 @@ export default function MatchList({ userId }: { userId: string }) {
                     />
                   </div>
 
-                  <span className="font-medium w-28">{match.awayTeam}</span>
+                  <span className="font-medium w-28 truncate flex items-center gap-1.5">
+                    {match.awayTeamCode && (
+                      <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain inline-block" />
+                    )}
+                    <span>{match.awayTeam}</span>
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {getStageBadge(match.stage)}
                   <Button
                     size="sm"
-                    onClick={() => savePrediction(match.id)}
+                    onClick={() => handleSave(match.id)}
                     disabled={savingId === match.id || !predictions[match.id]?.home || !predictions[match.id]?.away}
                   >
                     {savingId === match.id ? "..." : savedIds.has(match.id) ? "Aktualisieren" : "Tipp speichern"}

@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, integer, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 
 export const user = pgTable("better_auth_user", {
   id: text("id").primaryKey(),
@@ -7,6 +7,7 @@ export const user = pgTable("better_auth_user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  username: text("username").unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -74,27 +75,6 @@ export const verification = pgTable(
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
-
-export const matches = pgTable("matches", {
-  id: serial("id").primaryKey(),
-  homeTeam: text("home_team").notNull(),
-  awayTeam: text("away_team").notNull(),
-  matchDate: timestamp("match_date").notNull(),
-  groupName: text("group_name"),
-  stage: text("stage").notNull().default("group"),
-});
-
-export const predictions = pgTable("predictions", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id),
-  matchId: integer("match_id")
-    .notNull()
-    .references(() => matches.id),
-  homeScore: integer("home_score").notNull(),
-  awayScore: integer("away_score").notNull(),
-});
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),

@@ -1,10 +1,7 @@
 import { createAuthClient } from "better-auth/client";
+import { usernameClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:3000",
-  fetchOptions: {
-    customFetch: async (url, options) => {
-      return fetch(url, options);
-    },
-  },
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"),
+  plugins: [usernameClient()],
 });
