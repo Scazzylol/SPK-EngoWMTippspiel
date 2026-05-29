@@ -31,7 +31,11 @@ const errorTranslations: Record<string, string> = {
 function translateError(err: any): string {
   if (!err) return "";
   const msg = err.message || (typeof err === "string" ? err : "");
-  return errorTranslations[msg] || msg || "Etwas ist schiefgelaufen";
+  const detail = err.code || err.status || "";
+  const translated = errorTranslations[msg];
+  if (translated) return translated;
+  if (msg) return msg;
+  return `Fehler ${detail ? `(${detail})` : ""}`.trim() || "Etwas ist schiefgelaufen";
 }
 
 function LoginForm() {
@@ -67,7 +71,7 @@ function LoginForm() {
           router.push("/matches");
           router.refresh();
         } else {
-          setError(translateError(result?.error));
+          setError(result?.error ? JSON.stringify(result.error).slice(0, 200) : "Unbekannter Fehler");
         }
       } else {
         const placeholderEmail = `${username}@wmtippspiel.app`;
@@ -82,11 +86,11 @@ function LoginForm() {
           router.push("/matches");
           router.refresh();
         } else {
-          setError(translateError(result?.error));
+          setError(result?.error ? JSON.stringify(result.error).slice(0, 200) : "Unbekannter Fehler");
         }
       }
     } catch (err: any) {
-      setError(err.message || "Etwas ist schiefgelaufen");
+      setError(err?.message || JSON.stringify(err).slice(0, 200) || "Unbekannter Fehler");
     } finally {
       setLoading(false);
     }
