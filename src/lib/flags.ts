@@ -1,16 +1,16 @@
 const FIFA_TO_ISO2: Record<string, string> = {
-  USA: "us", ESP: "es", MAR: "ma", ZIM: "zw",
-  ARG: "ar", CAN: "ca", COL: "co", NGA: "ng",
-  MEX: "mx", BRA: "br", JPN: "jp", CRC: "cr",
-  FRA: "fr", UKR: "ua", SEN: "sn", AUS: "au",
-  ENG: "gb-eng", SRB: "rs", IRQ: "iq", ECU: "ec",
-  GER: "de", SUI: "ch", PAR: "py", HON: "hn",
-  POR: "pt", ITA: "it", KOR: "kr", PAN: "pa",
-  NED: "nl", DEN: "dk", URU: "uy", MLI: "ml",
-  BEL: "be", AUT: "at", IRN: "ir", JAM: "jm",
-  POL: "pl", SCO: "gb-sct", KSA: "sa", ISL: "is",
-  CRO: "hr", SWE: "se", UZB: "uz", EGY: "eg",
-  GEO: "ge", ROU: "ro", BIH: "ba", CHA: "td",
+  MEX: "mx", RSA: "za", KOR: "kr", CZE: "cz",
+  CAN: "ca", BIH: "ba", QAT: "qa", SUI: "ch",
+  BRA: "br", MAR: "ma", HAI: "ht", SCO: "gb-sct",
+  USA: "us", PAR: "py", AUS: "au", TUR: "tr",
+  GER: "de", CUW: "cw", CIV: "ci", ECU: "ec",
+  NED: "nl", JPN: "jp", SWE: "se", TUN: "tn",
+  BEL: "be", EGY: "eg", IRN: "ir", NZL: "nz",
+  ESP: "es", CPV: "cv", KSA: "sa", URU: "uy",
+  FRA: "fr", SEN: "sn", IRQ: "iq", NOR: "no",
+  ARG: "ar", ALG: "dz", AUT: "at", JOR: "jo",
+  POR: "pt", COD: "cd", UZB: "uz", COL: "co",
+  ENG: "gb-eng", CRO: "hr", GHA: "gh", PAN: "pa",
 };
 
 export function getFlagUrl(code: string): string {
