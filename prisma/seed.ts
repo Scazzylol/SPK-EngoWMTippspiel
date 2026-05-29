@@ -3,7 +3,8 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Stage } from "../src/generated/prisma/enums";
 
-const pgAdapter = new PrismaPg(process.env.DATABASE_URL!);
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL!;
+const pgAdapter = new PrismaPg(connectionString);
 const prisma = new PrismaClient({ adapter: pgAdapter });
 
 interface TeamData {

@@ -5,7 +5,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins/username";
 import * as schema from "./auth-schema";
 
-const client = postgres(process.env.DATABASE_URL!);
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL!;
+const client = postgres(connectionString);
 const db = drizzle(client, { schema });
 
 export const auth = betterAuth({
