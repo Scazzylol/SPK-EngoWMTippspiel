@@ -19,6 +19,18 @@ interface Match {
   matchDate: string;
   groupName?: string;
   stage: string;
+  hasTeams: boolean;
+  isLocked: boolean;
+  homeScore: number | null;
+  awayScore: number | null;
+}
+
+interface MatchTip {
+  userId: string;
+  homeScore: number;
+  awayScore: number;
+  name: string;
+  username: string;
 }
 
 export default function MatchList({ userId }: { userId: string }) {
@@ -29,6 +41,9 @@ export default function MatchList({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [expandedTips, setExpandedTips] = useState<Set<string>>(new Set());
+  const [matchTips, setMatchTips] = useState<Record<string, MatchTip[]>>({});
+  const [loadingTips, setLoadingTips] = useState<Set<string>>(new Set());
 
   const fetchMatches = useCallback(async () => {
     try {
@@ -101,15 +116,57 @@ export default function MatchList({ userId }: { userId: string }) {
     setSavingId(null);
   };
 
+  const handleToggleTips = async (matchId: string) => {
+    if (expandedTips.has(matchId)) {
+      setExpandedTips((prev) => {
+        const next = new Set(prev);
+        next.delete(matchId);
+        return next;
+      });
+      return;
+    }
+
+    if (!matchTips[matchId]) {
+      setLoadingTips((prev) => new Set(prev).add(matchId));
+      try {
+        const res = await fetch(`/api/predictions?matchId=${matchId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setMatchTips((prev) => ({ ...prev, [matchId]: data }));
+        }
+      } catch (e) {
+        console.error("Failed to fetch tips:", e);
+      }
+      setLoadingTips((prev) => {
+        const next = new Set(prev);
+        next.delete(matchId);
+        return next;
+      });
+    }
+
+    setExpandedTips((prev) => new Set(prev).add(matchId));
+  };
+
   const getStageBadge = (stage: string) => {
     const label = getStageLabel(stage);
-    if (stage === "final") {
-      return <Badge className="bg-yellow-500 text-black hover:bg-yellow-600">{label}</Badge>;
+    switch (stage) {
+      case "final":
+        return <Badge className="bg-yellow-500 text-black hover:bg-yellow-600">{label}</Badge>;
+      case "semi_finals":
+        return <Badge className="border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-300">{label}</Badge>;
+      case "quarter_finals":
+        return <Badge className="border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">{label}</Badge>;
+      case "round_of_16":
+        return <Badge className="border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300">{label}</Badge>;
+      case "round_of_32":
+        return <Badge className="border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-300">{label}</Badge>;
+      case "third_place":
+        return <Badge className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300">{label}</Badge>;
+      case "group":
+        return <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800">{label}</Badge>;
+      default:
+        return <Badge variant="outline">{label}</Badge>;
     }
-    if (stage === "group") {
-      return <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800">{label}</Badge>;
-    }
-    return <Badge className="bg-[#D40000] hover:bg-[#B00000] text-white">{label}</Badge>;
   };
 
   if (loading) {
@@ -153,81 +210,140 @@ export default function MatchList({ userId }: { userId: string }) {
               const isSaving = savingId === match.id;
               const hasInput = predictions[match.id]?.home && predictions[match.id]?.away;
 
+              const hasResult = match.homeScore !== null && match.awayScore !== null;
+              const isMatchLocked = match.isLocked || hasResult || new Date(match.matchDate) < new Date();
+              const tips = matchTips[match.id];
+              const isExpanded = expandedTips.has(match.id);
+              const isLoadingTips = loadingTips.has(match.id);
+
               return (
-                <div
-                  key={match.id}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                >
-                  {/* Datum */}
-                  <div className="flex-shrink-0 w-28 text-xs text-zinc-400 font-medium">
-                    {new Date(match.matchDate).toLocaleDateString("de-DE", {
-                      day: "2-digit",
-                      month: "2-digit",
-                    })}
-                    <br />
-                    {new Date(match.matchDate).toLocaleTimeString("de-DE", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
-
-                  {/* Teams + Score */}
-                  <div className="flex items-center gap-2 flex-1 justify-center">
-                    <span className="font-medium text-right w-28 truncate flex items-center justify-end gap-1.5 text-sm">
-                      <span>{match.homeTeam}</span>
-                      {match.homeTeamCode && (
-                        <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
-                      )}
-                    </span>
-
-                    <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        min="0"
-                        max="99"
-                        className="w-12 h-9 text-center text-sm px-1"
-                        value={predictions[match.id]?.home ?? ""}
-                        placeholder="-"
-                        onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
-                      />
-                      <span className="text-zinc-300 dark:text-zinc-600 font-bold">:</span>
-                      <Input
-                        type="number"
-                        min="0"
-                        max="99"
-                        className="w-12 h-9 text-center text-sm px-1"
-                        value={predictions[match.id]?.away ?? ""}
-                        placeholder="-"
-                        onChange={(e) => handlePredictionChange(match.id, "away", e.target.value)}
-                      />
+                <div key={match.id}>
+                  <div className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    {/* Datum */}
+                    <div className="flex-shrink-0 w-28 text-xs text-zinc-400 font-medium">
+                      {new Date(match.matchDate).toLocaleDateString("de-DE", {
+                        day: "2-digit",
+                        month: "2-digit",
+                      })}
+                      <br />
+                      {new Date(match.matchDate).toLocaleTimeString("de-DE", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </div>
 
-                    <span className="font-medium w-28 truncate flex items-center gap-1.5 text-sm">
-                      {match.awayTeamCode && (
-                        <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
+                    {/* Teams + Score */}
+                    <div className="flex items-center gap-2 flex-1 justify-center">
+                      <span className={`font-medium text-right w-28 truncate flex items-center justify-end gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : ""}`}>
+                        <span>{match.hasTeams ? match.homeTeam : "???"}</span>
+                        {match.homeTeamCode && (
+                          <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
+                        )}
+                      </span>
+
+                      {match.hasTeams ? (
+                        <div className="flex items-center gap-1">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="99"
+                            className="w-12 h-9 text-center text-sm px-1"
+                            value={predictions[match.id]?.home ?? ""}
+                            placeholder="-"
+                            onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
+                          />
+                          <span className="text-zinc-300 dark:text-zinc-600 font-bold">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="99"
+                            className="w-12 h-9 text-center text-sm px-1"
+                            value={predictions[match.id]?.away ?? ""}
+                            placeholder="-"
+                            onChange={(e) => handlePredictionChange(match.id, "away", e.target.value)}
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-xs text-zinc-400 dark:text-zinc-500 italic text-center px-2">
+                          Teams noch nicht bekannt
+                        </div>
                       )}
-                      <span>{match.awayTeam}</span>
-                    </span>
+
+                      <span className={`font-medium w-28 truncate flex items-center gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : ""}`}>
+                        {match.awayTeamCode && (
+                          <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
+                        )}
+                        <span>{match.hasTeams ? match.awayTeam : "???"}</span>
+                      </span>
+                    </div>
+
+                    {/* Badge + Buttons */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {getStageBadge(match.stage)}
+                      {isMatchLocked && match.hasTeams && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleToggleTips(match.id)}
+                          className="text-xs"
+                        >
+                          {isLoadingTips ? "..." : isExpanded ? "Schließen" : "Tipps"}
+                        </Button>
+                      )}
+                      {isMatchLocked ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 cursor-default">
+                          🔒 Beendet
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSave(match.id)}
+                          disabled={isSaving || !hasInput || !match.hasTeams}
+                          className={
+                            isJustSaved
+                              ? "bg-green-600 hover:bg-green-700 text-white"
+                              : isSaved
+                                ? "bg-zinc-600 hover:bg-zinc-700 text-white"
+                                : "bg-[#D40000] hover:bg-[#B00000] text-white"
+                          }
+                        >
+                          {!match.hasTeams ? "Teams unbekannt" : isSaving ? "..." : isJustSaved ? "✓ Gespeichert" : isSaved ? "Aktualisieren" : "Tipp speichern"}
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Badge + Button */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {getStageBadge(match.stage)}
-                    <Button
-                      size="sm"
-                      onClick={() => handleSave(match.id)}
-                      disabled={isSaving || !hasInput}
-                      className={
-                        isJustSaved
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : isSaved
-                            ? "bg-zinc-600 hover:bg-zinc-700 text-white"
-                            : "bg-[#D40000] hover:bg-[#B00000] text-white"
-                      }
-                    >
-                      {isSaving ? "..." : isJustSaved ? "✓ Gespeichert" : isSaved ? "Aktualisieren" : "Tipp speichern"}
-                    </Button>
-                  </div>
+                  {/* Ausgeklappte Tipps-Liste */}
+                  {isExpanded && tips && (
+                    <div className="border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 px-4 py-3">
+                      <div className="text-xs font-medium text-zinc-500 mb-2">Tipps aller Teilnehmer</div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5">
+                        {tips.map((tip) => {
+                          const isOwn = tip.userId === userId;
+                          return (
+                            <div
+                              key={tip.userId}
+                              className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs ${
+                                isOwn
+                                  ? "bg-[#D40000]/10 ring-1 ring-[#D40000]/30"
+                                  : "bg-white dark:bg-zinc-800"
+                              }`}
+                            >
+                              <span className="font-medium truncate flex-1">
+                                {tip.name}
+                                {isOwn && (
+                                  <span className="text-[#D40000] ml-1 font-bold">(Du)</span>
+                                )}
+                              </span>
+                              <span className="font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-300">
+                                {tip.homeScore}:{tip.awayScore}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

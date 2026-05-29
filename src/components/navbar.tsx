@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getSession } from "@/lib/session";
+import { isAdmin } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { logout } from "@/actions/auth";
 import { SparkasseLogo } from "@/components/sparkasse-logo";
 
 export default async function Navbar() {
-  const session = await getSession();
+  const [session, admin] = await Promise.all([getSession(), isAdmin()]);
   const user = session?.user ?? null;
 
   return (
@@ -35,6 +36,14 @@ export default async function Navbar() {
               >
                 Rangliste
               </Link>
+              {admin && (
+                <Link
+                  href="/admin"
+                  className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                >
+                  Admin
+                </Link>
+              )}
               <Separator orientation="vertical" className="h-5" />
               <span className="text-sm text-zinc-500 dark:text-zinc-400 px-2">
                 {user.name}

@@ -1,0 +1,348 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { getStageLabel, normalizeStage } from "@/lib/stage-labels";
+import { getFlagUrl } from "@/lib/flags";
+import { getAdminMatches, updateMatchResult, toggleMatchLock, calculateKnockout } from "@/actions/admin";
+
+interface AdminMatch {
+  id: string;
+  homeTeam: string;
+  awayTeam: string;
+  groupName: string | null;
+  stage: string;
+  startTime: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  isLocked: boolean;
+}
+
+function getStageBadge(stage: string) {
+  const label = getStageLabel(stage);
+  const s = normalizeStage(stage);
+  switch (s) {
+    case "final":
+      return <Badge className="bg-yellow-500 text-black">{label}</Badge>;
+    case "semi_finals":
+      return <Badge className="border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-300">{label}</Badge>;
+    case "quarter_finals":
+      return <Badge className="border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">{label}</Badge>;
+    case "round_of_16":
+      return <Badge className="border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300">{label}</Badge>;
+    case "round_of_32":
+      return <Badge className="border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-300">{label}</Badge>;
+    case "third_place":
+      return <Badge className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300">{label}</Badge>;
+    case "group":
+      return <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800">{label}</Badge>;
+    default:
+      return <Badge variant="outline">{label}</Badge>;
+  }
+}
+
+export default function AdminPage() {
+  const router = useRouter();
+  const [matches, setMatches] = useState<AdminMatch[]>([]);
+  const [scores, setScores] = useState<Record<string, { home: string; away: string }>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [justSavedIds, setJustSavedIds] = useState<Set<string>>(new Set());
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(true);
+  const [calculatingKo, setCalculatingKo] = useState(false);
+
+  const fetchMatches = useCallback(async () => {
+    setLoading(true);
+    const data = await getAdminMatches();
+    if (data.length === 0) {
+      const check = await import("@/actions/admin").then((m) => m.getAdminMatches());
+      if (!check.length) {
+        setAuthorized(false);
+        setLoading(false);
+        return;
+      }
+    }
+    setMatches(data);
+    const initialScores: Record<string, { home: string; away: string }> = {};
+    const initialSaved = new Set<string>();
+    for (const m of data) {
+      initialScores[m.id] = {
+        home: m.homeScore !== null ? String(m.homeScore) : "",
+        away: m.awayScore !== null ? String(m.awayScore) : "",
+      };
+      if (m.homeScore !== null) initialSaved.add(m.id);
+    }
+    setScores(initialScores);
+    setSavedIds(initialSaved);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchMatches();
+  }, [fetchMatches]);
+
+  const handleSave = async (matchId: string) => {
+    const s = scores[matchId];
+    const home = s?.home !== "" ? parseInt(s.home) : null;
+    const away = s?.away !== "" ? parseInt(s.away) : null;
+
+    if (home !== null && (isNaN(home) || home < 0 || home > 99)) return;
+    if (away !== null && (isNaN(away) || away < 0 || away > 99)) return;
+
+    setSavingId(matchId);
+    setMessage(null);
+
+    const result = await updateMatchResult(matchId, home, away);
+    if (result?.error) {
+      setMessage({ type: "error", text: result.error });
+    } else {
+      setMessage({ type: "success", text: "Ergebnis gespeichert" });
+      setMatches((prev) =>
+        prev.map((m) => (m.id === matchId ? { ...m, homeScore: home, awayScore: away } : m))
+      );
+      setSavedIds((prev) => new Set(prev).add(matchId));
+      setJustSavedIds((prev) => new Set(prev).add(matchId));
+      setTimeout(() => {
+        setJustSavedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(matchId);
+          return next;
+        });
+      }, 2000);
+    }
+    setSavingId(null);
+  };
+
+  const handleToggleLock = async (matchId: string) => {
+    setMessage(null);
+    const result = await toggleMatchLock(matchId);
+    if (result?.error) {
+      setMessage({ type: "error", text: result.error });
+    } else {
+      setMessage({ type: "success", text: "Status geändert" });
+      setMatches((prev) =>
+        prev.map((m) => (m.id === matchId ? { ...m, isLocked: !m.isLocked } : m))
+      );
+    }
+  };
+
+  const handleCalculateKnockout = async () => {
+    setCalculatingKo(true);
+    setMessage(null);
+    const result = await calculateKnockout();
+    if (result?.error) {
+      setMessage({ type: "error", text: result.error });
+    } else {
+      setMessage({ type: "success", text: "KO-Phase berechnet – Teams wurden gesetzt" });
+      fetchMatches();
+    }
+    setCalculatingKo(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3 text-zinc-500">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600" />
+            Lade Admin-Panel...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authorized) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/50 px-6 py-12 text-center">
+          <h1 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Kein Zugriff</h1>
+          <p className="text-zinc-600 dark:text-zinc-400">Du hast keine Admin-Rechte.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const groupedMatches = matches.reduce(
+    (acc, m) => {
+      const key = m.groupName || normalizeStage(m.stage);
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    },
+    {} as Record<string, AdminMatch[]>
+  );
+
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Admin-Panel</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+          Spiele verwalten und Ergebnisse eintragen
+        </p>
+      </div>
+
+      {message && (
+        <div
+          className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
+            message.type === "success"
+              ? "border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950/50 dark:text-green-400"
+              : "border-red-200 bg-red-50 text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
+      <div className="mb-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-sm">KO-Phase berechnen</h3>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Nachdem alle Gruppenspiele Ergebnisse haben, werden hier die Achtelfinal-Paarungen nach FIFA-2026-Regel berechnet
+            </p>
+          </div>
+          <Button
+            onClick={handleCalculateKnockout}
+            disabled={calculatingKo}
+            className="bg-zinc-900 hover:bg-zinc-700 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            {calculatingKo ? "Berechne..." : "KO-Phase berechnen"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="space-y-8">
+        {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
+          <div key={groupName}>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-bold">{getStageLabel(groupName)}</h2>
+              <Badge variant="outline" className="text-zinc-500">
+                {groupMatches.length} Spiele
+              </Badge>
+            </div>
+
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50">
+                    <th className="text-left px-4 py-2 font-medium text-zinc-500 w-32">Datum</th>
+                    <th className="text-left px-4 py-2 font-medium text-zinc-500">Spiel</th>
+                    <th className="text-center px-4 py-2 font-medium text-zinc-500 w-40">Ergebnis</th>
+                    <th className="text-center px-4 py-2 font-medium text-zinc-500 w-24">Status</th>
+                    <th className="text-right px-4 py-2 font-medium text-zinc-500 w-32">Aktion</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  {groupMatches.map((match) => {
+                    const isSaving = savingId === match.id;
+                    const hasScore =
+                      scores[match.id]?.home !== "" && scores[match.id]?.away !== "";
+
+                    return (
+                      <tr
+                        key={match.id}
+                        className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
+                      >
+                        <td className="px-4 py-3 text-xs text-zinc-400">
+                          {new Date(match.startTime).toLocaleDateString("de-DE", {
+                            day: "2-digit",
+                            month: "2-digit",
+                          })}
+                          <br />
+                          {new Date(match.startTime).toLocaleTimeString("de-DE", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{match.homeTeam}</span>
+                            <span className="text-zinc-300 dark:text-zinc-600">–</span>
+                            <span className="font-medium">{match.awayTeam}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-center gap-1">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="99"
+                              className="w-12 h-8 text-center text-sm px-1"
+                              value={scores[match.id]?.home ?? ""}
+                              placeholder="-"
+                              onChange={(e) =>
+                                setScores((prev) => ({
+                                  ...prev,
+                                  [match.id]: { ...prev[match.id], home: e.target.value },
+                                }))
+                              }
+                            />
+                            <span className="text-zinc-300 dark:text-zinc-600 font-bold">:</span>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="99"
+                              className="w-12 h-8 text-center text-sm px-1"
+                              value={scores[match.id]?.away ?? ""}
+                              placeholder="-"
+                              onChange={(e) =>
+                                setScores((prev) => ({
+                                  ...prev,
+                                  [match.id]: { ...prev[match.id], away: e.target.value },
+                                }))
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => handleToggleLock(match.id)}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                              match.isLocked
+                                ? "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
+                            }`}
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                match.isLocked ? "bg-red-500" : "bg-green-500"
+                              }`}
+                            />
+                            {match.isLocked ? "Gesperrt" : "Offen"}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Button
+                            size="sm"
+                            onClick={() => handleSave(match.id)}
+                            disabled={isSaving || !hasScore}
+                            className={
+                              justSavedIds.has(match.id)
+                                ? "bg-green-600 hover:bg-green-700 text-white"
+                                : savedIds.has(match.id)
+                                  ? "bg-zinc-500 hover:bg-zinc-600 text-white dark:bg-zinc-600 dark:hover:bg-zinc-500"
+                                  : "bg-[#D40000] hover:bg-[#B00000] text-white"
+                            }
+                          >
+                            {isSaving ? "..." : justSavedIds.has(match.id) ? "✓ Gespeichert" : "Speichern"}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

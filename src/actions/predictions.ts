@@ -22,8 +22,11 @@ export async function savePrediction(matchId: string, homeScore: number, awaySco
   }
 
   try {
-    const [match] = await sql`SELECT "isLocked", "startTime" FROM "Match" WHERE id = ${matchId}`;
+    const [match] = await sql`SELECT "isLocked", "startTime", "homeTeamId", "awayTeamId" FROM "Match" WHERE id = ${matchId}`;
     if (!match) return { error: "Spiel nicht gefunden" };
+    if (!match.homeTeamId || !match.awayTeamId) {
+      return { error: "Teams für dieses Spiel stehen noch nicht fest" };
+    }
     if (match.isLocked || new Date(match.startTime) < new Date()) {
       return { error: "Spiel ist bereits gesperrt" };
     }

@@ -45,7 +45,7 @@ export async function GET() {
     }
 
     const users = await sql<UserRow[]>`
-      SELECT id, name FROM "better_auth_user" WHERE id = ANY(${userIds})
+      SELECT id, name FROM "better_auth_user" WHERE id = ANY(${userIds}) AND is_admin = false
     `;
 
     const userNames: Record<string, string> = {};

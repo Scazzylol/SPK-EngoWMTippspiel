@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db-singleton";
+import { normalizeStage } from "@/lib/stage-labels";
 
 interface MatchRow {
   id: string;
@@ -12,6 +13,7 @@ interface MatchRow {
   matchdate: Date;
   groupname: string | null;
   stage: string;
+  islocked: boolean;
 }
 
 interface MatchResponse {
@@ -25,19 +27,10 @@ interface MatchResponse {
   matchDate: string;
   groupName: string | null;
   stage: string;
-}
-
-function normalizeStage(stage: string): string {
-  const map: Record<string, string> = {
-    GROUP: "group",
-    ROUND_OF_32: "round_of_32",
-    ROUND_OF_16: "round_of_16",
-    QUARTER_FINALS: "quarter_finals",
-    SEMI_FINALS: "semi_finals",
-    THIRD_PLACE: "third_place",
-    FINAL: "final",
-  };
-  return map[stage] || stage.toLowerCase();
+  hasTeams: boolean;
+  isLocked: boolean;
+  homeScore: number | null;
+  awayScore: number | null;
 }
 
 export async function GET() {
@@ -53,7 +46,10 @@ export async function GET() {
         away."flagEmoji" AS awayTeamFlag,
         m."startTime" AS matchDate,
         g.name AS groupName,
-        m.stage
+        m.stage,
+        m."isLocked",
+        m."homeScore",
+        m."awayScore"
       FROM "Match" m
       LEFT JOIN "Team" home ON m."homeTeamId" = home.id
       LEFT JOIN "Team" away ON m."awayTeamId" = away.id
@@ -61,7 +57,7 @@ export async function GET() {
       ORDER BY m."startTime", m."matchNumber"
     `;
 
-    const matches: MatchResponse[] = rows.map((row) => ({
+    const matches: MatchResponse[] = rows.map((row: any) => ({
       id: row.id,
       homeTeam: row.hometeamname || "TBD",
       homeTeamCode: row.hometeamcode || null,
@@ -72,6 +68,10 @@ export async function GET() {
       matchDate: row.matchdate.toISOString(),
       groupName: row.groupname || null,
       stage: normalizeStage(row.stage),
+      hasTeams: !!(row.hometeamcode && row.awayteamcode),
+      isLocked: row.islocked,
+      homeScore: row.homeScore ?? null,
+      awayScore: row.awayScore ?? null,
     }));
 
     return NextResponse.json(matches);
