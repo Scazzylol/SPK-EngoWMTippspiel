@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { getStageLabel, normalizeStage } from "@/lib/stage-labels";
-import { getFlagUrl } from "@/lib/flags";
 import { getAdminMatches, updateMatchResult, toggleMatchLock, calculateKnockout } from "@/actions/admin";
 
 interface AdminMatch {
@@ -29,15 +26,15 @@ function getStageBadge(stage: string) {
     case "final":
       return <Badge className="bg-yellow-500 text-black">{label}</Badge>;
     case "semi_finals":
-      return <Badge className="border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-950 dark:text-violet-300">{label}</Badge>;
+      return <Badge className="border-violet-500/30 bg-violet-500/10 text-violet-300">{label}</Badge>;
     case "quarter_finals":
-      return <Badge className="border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">{label}</Badge>;
+      return <Badge className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300">{label}</Badge>;
     case "round_of_16":
-      return <Badge className="border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300">{label}</Badge>;
+      return <Badge className="border-blue-500/30 bg-blue-500/10 text-blue-300">{label}</Badge>;
     case "round_of_32":
-      return <Badge className="border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-300">{label}</Badge>;
+      return <Badge className="border-sky-500/30 bg-sky-500/10 text-sky-300">{label}</Badge>;
     case "third_place":
-      return <Badge className="border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-300">{label}</Badge>;
+      return <Badge className="border-orange-500/30 bg-orange-500/10 text-orange-300">{label}</Badge>;
     case "group":
       return <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800">{label}</Badge>;
     default:
@@ -46,7 +43,6 @@ function getStageBadge(stage: string) {
 }
 
 export default function AdminPage() {
-  const router = useRouter();
   const [matches, setMatches] = useState<AdminMatch[]>([]);
   const [scores, setScores] = useState<Record<string, { home: string; away: string }>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -104,7 +100,7 @@ export default function AdminPage() {
     } else {
       setMessage({ type: "success", text: "Ergebnis gespeichert" });
       setMatches((prev) =>
-        prev.map((m) => (m.id === matchId ? { ...m, homeScore: home, awayScore: away } : m))
+        prev.map((m) => (m.id === matchId ? { ...m, homeScore: home, awayScore: away, isLocked: true } : m))
       );
       setSavedIds((prev) => new Set(prev).add(matchId));
       setJustSavedIds((prev) => new Set(prev).add(matchId));
@@ -147,10 +143,11 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex items-center justify-center py-20">
-          <div className="flex items-center gap-3 text-zinc-500">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600" />
+      <div className="relative min-h-[calc(100vh-3.5rem)]">
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+        <div className="relative z-10 flex items-center justify-center py-20">
+          <div className="flex items-center gap-3 text-zinc-400">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-600 border-t-zinc-300" />
             Lade Admin-Panel...
           </div>
         </div>
@@ -160,10 +157,13 @@ export default function AdminPage() {
 
   if (!authorized) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/50 px-6 py-12 text-center">
-          <h1 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Kein Zugriff</h1>
-          <p className="text-zinc-600 dark:text-zinc-400">Du hast keine Admin-Rechte.</p>
+      <div className="relative min-h-[calc(100vh-3.5rem)]">
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+        <div className="relative z-10 flex items-center justify-center py-20">
+          <div className="rounded-xl border border-red-500/20 bg-red-500/10 backdrop-blur-sm px-8 py-12 text-center">
+            <h1 className="text-xl font-bold text-red-400 mb-2">Kein Zugriff</h1>
+            <p className="text-zinc-400">Du hast keine Admin-Rechte.</p>
+          </div>
         </div>
       </div>
     );
@@ -180,168 +180,178 @@ export default function AdminPage() {
   );
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin-Panel</h1>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-          Spiele verwalten und Ergebnisse eintragen
-        </p>
-      </div>
+    <div className="relative min-h-[calc(100vh-3.5rem)]">
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/10 via-transparent to-transparent" />
 
-      {message && (
-        <div
-          className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
-            message.type === "success"
-              ? "border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950/50 dark:text-green-400"
-              : "border-red-200 bg-red-50 text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400"
-          }`}
-        >
-          {message.text}
+      <div className="relative z-10 container mx-auto py-10 px-4">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            Admin{" "}
+            <span className="bg-gradient-to-r from-red-300 via-[#D40000] to-red-700 bg-clip-text text-transparent">
+              Panel
+            </span>
+          </h1>
+          <p className="text-zinc-400 mt-2">
+            Spiele verwalten und Ergebnisse eintragen
+          </p>
         </div>
-      )}
 
-      <div className="mb-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-sm">KO-Phase berechnen</h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Nachdem alle Gruppenspiele Ergebnisse haben, werden hier die Achtelfinal-Paarungen nach FIFA-2026-Regel berechnet
-            </p>
-          </div>
-          <Button
-            onClick={handleCalculateKnockout}
-            disabled={calculatingKo}
-            className="bg-zinc-900 hover:bg-zinc-700 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        {message && (
+          <div
+            className={`mb-6 rounded-xl border backdrop-blur-sm px-5 py-3 text-sm ${
+              message.type === "success"
+                ? "border-green-500/20 bg-green-500/10 text-green-300"
+                : "border-red-500/20 bg-red-500/10 text-red-300"
+            }`}
           >
-            {calculatingKo ? "Berechne..." : "KO-Phase berechnen"}
-          </Button>
-        </div>
-      </div>
-
-      <div className="space-y-8">
-        {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
-          <div key={groupName}>
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-lg font-bold">{getStageLabel(groupName)}</h2>
-              <Badge variant="outline" className="text-zinc-500">
-                {groupMatches.length} Spiele
-              </Badge>
-            </div>
-
-            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50">
-                    <th className="text-left px-4 py-2 font-medium text-zinc-500 w-32">Datum</th>
-                    <th className="text-left px-4 py-2 font-medium text-zinc-500">Spiel</th>
-                    <th className="text-center px-4 py-2 font-medium text-zinc-500 w-40">Ergebnis</th>
-                    <th className="text-center px-4 py-2 font-medium text-zinc-500 w-24">Status</th>
-                    <th className="text-right px-4 py-2 font-medium text-zinc-500 w-32">Aktion</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {groupMatches.map((match) => {
-                    const isSaving = savingId === match.id;
-                    const hasScore =
-                      scores[match.id]?.home !== "" && scores[match.id]?.away !== "";
-
-                    return (
-                      <tr
-                        key={match.id}
-                        className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
-                      >
-                        <td className="px-4 py-3 text-xs text-zinc-400">
-                          {new Date(match.startTime).toLocaleDateString("de-DE", {
-                            day: "2-digit",
-                            month: "2-digit",
-                          })}
-                          <br />
-                          {new Date(match.startTime).toLocaleTimeString("de-DE", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{match.homeTeam}</span>
-                            <span className="text-zinc-300 dark:text-zinc-600">–</span>
-                            <span className="font-medium">{match.awayTeam}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-center gap-1">
-                            <Input
-                              type="number"
-                              min="0"
-                              max="99"
-                              className="w-12 h-8 text-center text-sm px-1"
-                              value={scores[match.id]?.home ?? ""}
-                              placeholder="-"
-                              onChange={(e) =>
-                                setScores((prev) => ({
-                                  ...prev,
-                                  [match.id]: { ...prev[match.id], home: e.target.value },
-                                }))
-                              }
-                            />
-                            <span className="text-zinc-300 dark:text-zinc-600 font-bold">:</span>
-                            <Input
-                              type="number"
-                              min="0"
-                              max="99"
-                              className="w-12 h-8 text-center text-sm px-1"
-                              value={scores[match.id]?.away ?? ""}
-                              placeholder="-"
-                              onChange={(e) =>
-                                setScores((prev) => ({
-                                  ...prev,
-                                  [match.id]: { ...prev[match.id], away: e.target.value },
-                                }))
-                              }
-                            />
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => handleToggleLock(match.id)}
-                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-                              match.isLocked
-                                ? "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
-                                : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
-                            }`}
-                          >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${
-                                match.isLocked ? "bg-red-500" : "bg-green-500"
-                              }`}
-                            />
-                            {match.isLocked ? "Gesperrt" : "Offen"}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <Button
-                            size="sm"
-                            onClick={() => handleSave(match.id)}
-                            disabled={isSaving || !hasScore}
-                            className={
-                              justSavedIds.has(match.id)
-                                ? "bg-green-600 hover:bg-green-700 text-white"
-                                : savedIds.has(match.id)
-                                  ? "bg-zinc-500 hover:bg-zinc-600 text-white dark:bg-zinc-600 dark:hover:bg-zinc-500"
-                                  : "bg-[#D40000] hover:bg-[#B00000] text-white"
-                            }
-                          >
-                            {isSaving ? "..." : justSavedIds.has(match.id) ? "✓ Gespeichert" : "Speichern"}
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            {message.text}
           </div>
-        ))}
+        )}
+
+        <div className="mb-8 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-sm text-white">KO-Phase berechnen</h3>
+              <p className="text-xs text-zinc-500 mt-1">
+                Nachdem alle Gruppenspiele Ergebnisse haben, werden hier die Achtelfinal-Paarungen nach FIFA-2026-Regel berechnet
+              </p>
+            </div>
+            <Button
+              onClick={handleCalculateKnockout}
+              disabled={calculatingKo}
+              className="bg-white/10 hover:bg-white/15 text-white border border-white/10"
+            >
+              {calculatingKo ? "Berechne..." : "KO-Phase berechnen"}
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
+            <div key={groupName}>
+              <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-lg font-bold text-white">{getStageLabel(groupName)}</h2>
+                <Badge variant="outline" className="border-white/10 text-zinc-400">
+                  {groupMatches.length} Spiele
+                </Badge>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="text-left px-4 py-3 font-medium text-zinc-500 w-32">Datum</th>
+                      <th className="text-left px-4 py-3 font-medium text-zinc-500">Spiel</th>
+                      <th className="text-center px-4 py-3 font-medium text-zinc-500 w-40">Ergebnis</th>
+                      <th className="text-center px-4 py-3 font-medium text-zinc-500 w-24">Status</th>
+                      <th className="text-right px-4 py-3 font-medium text-zinc-500 w-32">Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {groupMatches.map((match) => {
+                      const isSaving = savingId === match.id;
+                      const hasScore =
+                        scores[match.id]?.home !== "" && scores[match.id]?.away !== "";
+
+                      return (
+                        <tr
+                          key={match.id}
+                          className="hover:bg-white/[0.03] transition-colors"
+                        >
+                          <td className="px-4 py-3 text-xs text-zinc-500">
+                            {new Date(match.startTime).toLocaleDateString("de-DE", {
+                              day: "2-digit",
+                              month: "2-digit",
+                            })}
+                            <br />
+                            {new Date(match.startTime).toLocaleTimeString("de-DE", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-zinc-200">{match.homeTeam}</span>
+                              <span className="text-zinc-600">–</span>
+                              <span className="font-medium text-zinc-200">{match.awayTeam}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-center gap-1">
+                              <Input
+                                type="number"
+                                min="0"
+                                max="99"
+                                className="w-12 h-8 text-center text-sm px-1 bg-white/5 border-white/10 text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                                value={scores[match.id]?.home ?? ""}
+                                placeholder="-"
+                                onChange={(e) =>
+                                  setScores((prev) => ({
+                                    ...prev,
+                                    [match.id]: { ...prev[match.id], home: e.target.value },
+                                  }))
+                                }
+                              />
+                              <span className="text-zinc-600 font-bold">:</span>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="99"
+                                className="w-12 h-8 text-center text-sm px-1 bg-white/5 border-white/10 text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                                value={scores[match.id]?.away ?? ""}
+                                placeholder="-"
+                                onChange={(e) =>
+                                  setScores((prev) => ({
+                                    ...prev,
+                                    [match.id]: { ...prev[match.id], away: e.target.value },
+                                  }))
+                                }
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              onClick={() => handleToggleLock(match.id)}
+                              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                                match.isLocked
+                                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                                  : "bg-green-500/10 text-green-400 border border-green-500/20"
+                              }`}
+                            >
+                              <span
+                                className={`h-1.5 w-1.5 rounded-full ${
+                                  match.isLocked ? "bg-red-500" : "bg-green-500"
+                                }`}
+                              />
+                              {match.isLocked ? "Gesperrt" : "Offen"}
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button
+                              size="sm"
+                              onClick={() => handleSave(match.id)}
+                              disabled={isSaving || !hasScore}
+                              className={
+                                justSavedIds.has(match.id)
+                                  ? "bg-green-600 hover:bg-green-700 text-white"
+                                  : savedIds.has(match.id)
+                                    ? "bg-white/10 hover:bg-white/15 text-zinc-300"
+                                    : "bg-[#D40000] hover:bg-[#B00000] text-white"
+                              }
+                            >
+                              {isSaving ? "..." : justSavedIds.has(match.id) ? "✓ Gespeichert" : "Speichern"}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

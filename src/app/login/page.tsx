@@ -93,28 +93,31 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
+      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D40000]/10 via-transparent to-transparent" />
+
+      <div className="relative z-10 w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#D40000] text-white text-3xl shadow-lg shadow-[#D40000]/25">
             ⚽
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold">WM Tippspiel 2026</h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            <h1 className="text-2xl font-bold text-white">WM Tippspiel 2026</h1>
+            <p className="text-sm text-zinc-500 mt-1">
               Sparkasse Engen-Gottmadingen
             </p>
           </div>
         </div>
 
         {/* Card */}
-        <Card className="border-zinc-200 dark:border-zinc-800 shadow-lg">
+        <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm shadow-xl">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl font-bold text-center">
+            <CardTitle className="text-xl font-bold text-center text-white">
               {isLogin ? "Anmelden" : "Registrieren"}
             </CardTitle>
-            <CardDescription className="text-center text-zinc-500">
+            <CardDescription className="text-center text-zinc-400">
               {isLogin
                 ? "Gib deinen Namen und dein Passwort ein"
                 : "Erstelle einen neuen Account für das Tippspiel"}
@@ -123,7 +126,7 @@ function LoginForm() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-sm font-medium">Name</Label>
+                <Label htmlFor="username" className="text-sm font-medium text-zinc-300">Name</Label>
                 <Input
                   id="username"
                   type="text"
@@ -134,7 +137,7 @@ function LoginForm() {
                   minLength={3}
                   spellCheck={false}
                   autoCapitalize="off"
-                  className="h-11"
+                  className="h-11 bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-[#D40000] focus:ring-[#D40000]/30"
                 />
                 {!isLogin && rawUsername !== username && (
                   <p className="text-xs text-zinc-500">
@@ -143,7 +146,7 @@ function LoginForm() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">Passwort (min. 8 Zeichen)</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-zinc-300">Passwort (min. 8 Zeichen)</Label>
                 <Input
                   id="password"
                   type="password"
@@ -152,11 +155,11 @@ function LoginForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="h-11"
+                  className="h-11 bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-[#D40000] focus:ring-[#D40000]/30"
                 />
               </div>
               {error && (
-                <div className="rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-300">
                   {error}
                 </div>
               )}
@@ -191,8 +194,8 @@ function LoginForm() {
 
         {/* Sparkasse branding */}
         <div className="flex flex-col items-center gap-2 pt-4">
-          <SparkasseLogo className="h-5 w-auto opacity-40" />
-          <p className="text-xs text-zinc-400 text-center">
+          <SparkasseLogo className="h-5 w-auto opacity-30" />
+          <p className="text-xs text-zinc-600 text-center">
             Das interne Tippspiel der Sparkasse Engen-Gottmadingen
           </p>
         </div>
@@ -204,9 +207,10 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
-        <div className="flex items-center gap-3 text-zinc-500">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600" />
+      <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
+        <div className="relative z-10 flex items-center gap-3 text-zinc-400">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-600 border-t-zinc-300" />
           Lade...
         </div>
       </div>

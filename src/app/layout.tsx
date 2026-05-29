@@ -30,7 +30,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <ThemeProvider>
           <div className="relative z-10 flex flex-col min-h-full">
             <Navbar />
