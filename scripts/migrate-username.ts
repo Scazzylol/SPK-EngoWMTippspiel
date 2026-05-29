@@ -7,6 +7,7 @@ async function main() {
   const sql = postgres(process.env.DATABASE_URL!);
 
   await sql.unsafe(`ALTER TABLE better_auth_user ADD COLUMN IF NOT EXISTS username TEXT UNIQUE`);
+  await sql.unsafe(`ALTER TABLE better_auth_user ADD COLUMN IF NOT EXISTS display_username TEXT`);
 
   const users = await sql<{ id: string; name: string }[]>`SELECT id, name FROM better_auth_user WHERE username IS NULL`;
 

@@ -1,22 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db-singleton";
 
-interface PredictionRow {
-  id: string;
-  userid: string;
-  matchid: string;
-  homescore: number;
-  awayscore: number;
-}
-
-interface PredictionResponse {
-  id: string;
-  userId: string;
-  matchId: string;
-  homeScore: number;
-  awayScore: number;
-}
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -26,14 +10,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
 
-    const rows = await sql<PredictionRow[]>`SELECT * FROM "Prediction" WHERE "userId" = ${userId}`;
+    const rows = await sql`SELECT id, "userId", "matchId", "homeScore", "awayScore" FROM "Prediction" WHERE "userId" = ${userId}`;
 
-    const predictions: PredictionResponse[] = rows.map((row) => ({
+    const predictions = rows.map((row: any) => ({
       id: row.id,
-      userId: row.userid,
-      matchId: row.matchid,
-      homeScore: row.homescore ?? 0,
-      awayScore: row.awayscore ?? 0,
+      userId: row.userId,
+      matchId: row.matchId,
+      homeScore: row.homeScore ?? 0,
+      awayScore: row.awayScore ?? 0,
     }));
 
     return NextResponse.json(predictions);

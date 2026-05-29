@@ -11,7 +11,12 @@ export default async function MatchesPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Spiele & Tipps</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Spiele & Tipps</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+          Tipp die Ergebnisse der WM 2026 – von der Gruppenphase bis zum Finale.
+        </p>
+      </div>
       <MatchList userId={session.user.id} />
     </div>
   );
