@@ -113,14 +113,14 @@ const GROUP_MATCH_TIMES: Record<string, string[]> = {
   "Gruppe C": [
     "2026-06-13T22:00:00Z", // BRA vs MAR
     "2026-06-14T01:00:00Z", // HAI vs SCO
-    "2026-06-20T00:30:00Z", // BRA vs HAI
+    "2026-06-20T01:00:00Z", // BRA vs HAI
     "2026-06-19T22:00:00Z", // MAR vs SCO
     "2026-06-24T22:00:00Z", // BRA vs SCO
     "2026-06-24T22:00:00Z", // MAR vs HAI
   ],
   "Gruppe D": [
     "2026-06-13T01:00:00Z", // USA vs PAR
-    "2026-06-14T16:00:00Z", // AUS vs TUR
+    "2026-06-14T04:00:00Z", // AUS vs TUR
     "2026-06-19T19:00:00Z", // USA vs AUS
     "2026-06-20T03:00:00Z", // PAR vs TUR
     "2026-06-26T02:00:00Z", // USA vs TUR
@@ -179,8 +179,8 @@ const GROUP_MATCH_TIMES: Record<string, string[]> = {
     "2026-06-18T02:00:00Z", // UZB vs COL
     "2026-06-23T17:00:00Z", // POR vs UZB
     "2026-06-24T02:00:00Z", // COD vs COL
-    "2026-06-28T03:30:00Z", // POR vs COL
-    "2026-06-28T03:30:00Z", // COD vs UZB
+    "2026-06-27T23:30:00Z", // POR vs COL
+    "2026-06-27T23:30:00Z", // COD vs UZB
   ],
   "Gruppe L": [
     "2026-06-17T20:00:00Z", // ENG vs CRO
@@ -194,44 +194,44 @@ const GROUP_MATCH_TIMES: Record<string, string[]> = {
 
 // UTC times for knockout matches (matchNumber order 73-104)
 const KNOCKOUT_MATCHES = [
-  // Round of 32 (Jun 28 - Jul 4)
-  { stage: Stage.ROUND_OF_32, time: "2026-06-29T02:00:00Z" },  // #73
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T00:30:00Z" },  // #74
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T07:00:00Z" },  // #75
-  { stage: Stage.ROUND_OF_32, time: "2026-06-29T22:00:00Z" },  // #76
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T01:00:00Z" },  // #77
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T22:00:00Z" },  // #78
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T07:00:00Z" },  // #79
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T20:00:00Z" },  // #80
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T03:00:00Z" },  // #82
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T07:00:00Z" },  // #81
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T02:00:00Z" },  // #84
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T03:00:00Z" },  // #83
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T10:00:00Z" },  // #85
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T23:00:00Z" },  // #88
-  { stage: Stage.ROUND_OF_32, time: "2026-07-04T02:00:00Z" },  // #86
-  { stage: Stage.ROUND_OF_32, time: "2026-07-04T06:30:00Z" },  // #87
+  // Round of 32 (Jun 29 - Jul 4)
+  { stage: Stage.ROUND_OF_32, time: "2026-06-29T19:00:00Z" },  // #73
+  { stage: Stage.ROUND_OF_32, time: "2026-06-29T22:00:00Z" },  // #74
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T01:00:00Z" },  // #75
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T19:00:00Z" },  // #76
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T22:00:00Z" },  // #77
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T01:00:00Z" },  // #78
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T20:00:00Z" },  // #79
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T23:00:00Z" },  // #80
+  { stage: Stage.ROUND_OF_32, time: "2026-07-02T19:00:00Z" },  // #81
+  { stage: Stage.ROUND_OF_32, time: "2026-07-02T22:00:00Z" },  // #82
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T01:00:00Z" },  // #83
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T19:00:00Z" },  // #84
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T22:00:00Z" },  // #85
+  { stage: Stage.ROUND_OF_32, time: "2026-07-04T01:00:00Z" },  // #86
+  { stage: Stage.ROUND_OF_32, time: "2026-07-04T19:00:00Z" },  // #87
+  { stage: Stage.ROUND_OF_32, time: "2026-07-04T22:00:00Z" },  // #88
   // Round of 16 (Jul 4 - Jul 7)
-  { stage: Stage.ROUND_OF_16, time: "2026-07-04T22:00:00Z" },  // #90
-  { stage: Stage.ROUND_OF_16, time: "2026-07-05T01:00:00Z" },  // #89
-  { stage: Stage.ROUND_OF_16, time: "2026-07-06T00:00:00Z" },  // #91
-  { stage: Stage.ROUND_OF_16, time: "2026-07-06T06:00:00Z" },  // #92
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T00:00:00Z" },  // #93
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T07:00:00Z" },  // #94
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T20:00:00Z" },  // #95
-  { stage: Stage.ROUND_OF_16, time: "2026-07-08T03:00:00Z" },  // #96
+  { stage: Stage.ROUND_OF_16, time: "2026-07-04T17:00:00Z" },  // #89
+  { stage: Stage.ROUND_OF_16, time: "2026-07-04T21:00:00Z" },  // #90
+  { stage: Stage.ROUND_OF_16, time: "2026-07-05T20:00:00Z" },  // #91
+  { stage: Stage.ROUND_OF_16, time: "2026-07-06T00:00:00Z" },  // #92
+  { stage: Stage.ROUND_OF_16, time: "2026-07-06T19:00:00Z" },  // #93
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T00:00:00Z" },  // #94
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T16:00:00Z" },  // #95
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T20:00:00Z" },  // #96
   // Quarter-finals (Jul 9 - Jul 12)
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-10T00:00:00Z" },  // #97
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-11T02:00:00Z" },  // #98
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T01:00:00Z" },  // #99
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T06:00:00Z" },  // #100
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-09T20:00:00Z" },  // #97
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-10T19:00:00Z" },  // #98
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-11T21:00:00Z" },  // #99
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T00:00:00Z" },  // #100
   // Semi-finals (Jul 14 - Jul 15)
-  { stage: Stage.SEMI_FINALS, time: "2026-07-15T00:00:00Z" },  // #101
-  { stage: Stage.SEMI_FINALS, time: "2026-07-15T23:00:00Z" },  // #102
+  { stage: Stage.SEMI_FINALS, time: "2026-07-14T10:00:00Z" },  // #101
+  { stage: Stage.SEMI_FINALS, time: "2026-07-15T19:00:00Z" },  // #102
   // Third place (Jul 18)
-  { stage: Stage.THIRD_PLACE, time: "2026-07-19T01:00:00Z" },  // #103
+  { stage: Stage.THIRD_PLACE, time: "2026-07-18T19:00:00Z" },  // #103
   // Final (Jul 19)
-  { stage: Stage.FINAL, time: "2026-07-19T23:00:00Z" },  // #104
+  { stage: Stage.FINAL, time: "2026-07-19T19:00:00Z" },  // #104
 ];
 
 async function main() {
