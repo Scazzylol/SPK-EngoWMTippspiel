@@ -51,15 +51,12 @@ export default async function LeaderboardPage() {
         {leaderboard.length === 0 ? (
           <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm p-12 text-center">
             <div className="text-5xl mb-4">🏆</div>
-            <p className="text-lg font-medium text-zinc-900 dark:text-white">Noch keine Punkte vergeben.</p>
-            <p className="text-sm text-zinc-500 mt-1">
-              Sobald Spiele beendet sind und Ergebnisse eingetragen wurden, erscheint hier die Rangliste.
-            </p>
+            <p className="text-lg font-medium text-zinc-900 dark:text-white">Keine Teilnehmer.</p>
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Top 3 Podium */}
-            {leaderboard.length >= 3 && (
+            {/* Top 3 Podium – nur wenn Punkte vergeben wurden */}
+            {leaderboard.length >= 3 && leaderboard.some((e) => e.points > 0) && (
               <div className="flex items-end justify-center gap-4 sm:gap-6 py-8">
                 {/* 2nd */}
                 <div className="flex flex-col items-center gap-3">

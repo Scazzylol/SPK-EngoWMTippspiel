@@ -14,10 +14,16 @@ interface MatchRow {
   groupname: string | null;
   stage: string;
   islocked: boolean;
+  homeScore: number | null;
+  awayScore: number | null;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
 }
 
 interface MatchResponse {
   id: string;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
   homeTeam: string;
   homeTeamCode: string | null;
   homeTeamFlag: string | null;
@@ -38,6 +44,8 @@ export async function GET() {
     const rows = await sql<MatchRow[]>`
       SELECT 
         m.id,
+        m."homeTeamId",
+        m."awayTeamId",
         home.name AS homeTeamName,
         home.code AS homeTeamCode,
         home."flagEmoji" AS homeTeamFlag,
@@ -59,6 +67,8 @@ export async function GET() {
 
     const matches: MatchResponse[] = rows.map((row: any) => ({
       id: row.id,
+      homeTeamId: row.homeTeamId ?? null,
+      awayTeamId: row.awayTeamId ?? null,
       homeTeam: row.hometeamname || "TBD",
       homeTeamCode: row.hometeamcode || null,
       homeTeamFlag: row.hometeamflag || null,

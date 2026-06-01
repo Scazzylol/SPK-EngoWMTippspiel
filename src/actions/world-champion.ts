@@ -7,12 +7,12 @@ export async function saveWorldChampion(teamId: string) {
   const session = await getSession();
   if (!session?.user) throw new Error("Nicht eingeloggt");
 
-  // Check if the first match has already started → world champion is locked
-  const firstMatch = await sql<{ matchDate: Date }[]>`
-    SELECT "matchDate" FROM "Match" ORDER BY "matchDate" ASC LIMIT 1
+  // Lock once any match has been finished or locked by admin
+  const lockedMatch = await sql<{ id: string }[]>`
+    SELECT id FROM "Match" WHERE "isLocked" = true OR ("homeScore" IS NOT NULL AND "awayScore" IS NOT NULL) LIMIT 1
   `;
-  if (firstMatch.length > 0 && new Date(firstMatch[0].matchDate) < new Date()) {
-    throw new Error("Der Weltmeister-Tipp ist gesperrt (erstes Spiel bereits angepfiffen)");
+  if (lockedMatch.length > 0) {
+    throw new Error("Der Weltmeister-Tipp ist gesperrt (erstes Spiel bereits beendet)");
   }
 
   await sql`

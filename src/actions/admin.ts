@@ -9,18 +9,20 @@ const matchSchema = z.object({
   matchId: z.string().min(1),
   homeScore: z.number().int().min(0).max(99).nullable(),
   awayScore: z.number().int().min(0).max(99).nullable(),
+  advancementWinnerId: z.string().nullable().optional(),
 });
 
 export async function updateMatchResult(
   matchId: string,
   homeScore: number | null,
-  awayScore: number | null
+  awayScore: number | null,
+  advancementWinnerId?: string | null
 ) {
   if (!(await isAdmin())) {
     return { error: "Keine Admin-Rechte" };
   }
 
-  const parsed = matchSchema.safeParse({ matchId, homeScore, awayScore });
+  const parsed = matchSchema.safeParse({ matchId, homeScore, awayScore, advancementWinnerId });
   if (!parsed.success) {
     return { error: "Ungültige Eingabe" };
   }
@@ -28,9 +30,13 @@ export async function updateMatchResult(
   try {
     await sql`
       UPDATE "Match"
-      SET "homeScore" = ${homeScore}, "awayScore" = ${awayScore}, "isLocked" = true, "updatedAt" = NOW()
+      SET "homeScore" = ${homeScore}, "awayScore" = ${awayScore},
+          "advancementWinnerId" = ${advancementWinnerId ?? null},
+          "isLocked" = true, "updatedAt" = NOW()
       WHERE id = ${matchId}
     `;
+
+    await autoAdvance();
     return { success: true };
   } catch (e) {
     console.error("updateMatchResult error:", e);
@@ -38,30 +44,24 @@ export async function updateMatchResult(
   }
 }
 
-export async function updateMatchResults(
-  results: { matchId: string; homeScore: number | null; awayScore: number | null }[]
-) {
-  if (!(await isAdmin())) {
-    return { error: "Keine Admin-Rechte" };
-  }
-
-  const parsed = z.array(matchSchema).safeParse(results);
-  if (!parsed.success) {
-    return { error: "Ungültige Eingabe" };
-  }
-
+async function autoAdvance() {
   try {
-    for (const r of results) {
-      await sql`
-        UPDATE "Match"
-        SET "homeScore" = ${r.homeScore}, "awayScore" = ${r.awayScore}, "isLocked" = true, "updatedAt" = NOW()
-        WHERE id = ${r.matchId}
-      `;
+    // Nur R32 berechnen, wenn noch nicht fortgeschritten (R16 hat keine Teams)
+    const [r16Check] = await sql`
+      SELECT COUNT(*)::int AS cnt FROM "Match"
+      WHERE stage = 'ROUND_OF_16'::"Stage" AND "homeTeamId" IS NOT NULL
+    `;
+    if (r16Check.cnt === 0) {
+      await calculateKnockoutStage();
     }
-    return { success: true };
+
+    // Alle KO-Runden fortlaufend vorrücken, solange möglich
+    while (true) {
+      const result = await advanceToNextRound();
+      if ("error" in result) break;
+    }
   } catch (e) {
-    console.error("updateMatchResults error:", e);
-    return { error: "Fehler beim Speichern" };
+    console.error("autoAdvance error:", e);
   }
 }
 
@@ -92,6 +92,9 @@ interface AdminMatch {
   startTime: string;
   homeScore: number | null;
   awayScore: number | null;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
+  advancementWinnerId: string | null;
   isLocked: boolean;
 }
 
@@ -104,6 +107,9 @@ export async function getAdminMatches(): Promise<AdminMatch[]> {
     const rows = await sql<any[]>`
       SELECT
         m.id,
+        m."homeTeamId",
+        m."awayTeamId",
+        m."advancementWinnerId",
         home.name AS "homeTeam",
         away.name AS "awayTeam",
         g.name AS "groupName",
@@ -121,6 +127,9 @@ export async function getAdminMatches(): Promise<AdminMatch[]> {
 
     return rows.map((row: any) => ({
       id: row.id,
+      homeTeamId: row.homeTeamId ?? null,
+      awayTeamId: row.awayTeamId ?? null,
+      advancementWinnerId: row.advancementWinnerId ?? null,
       homeTeam: row.homeTeam || "TBD",
       awayTeam: row.awayTeam || "TBD",
       groupName: row.groupName || null,

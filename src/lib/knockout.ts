@@ -1,4 +1,6 @@
 import { sql } from "@/lib/db-singleton";
+import { getMatchWinner } from "@/lib/scoring";
+import thirdPlaceMatrix from "@/data/fifa-2026-third-place-matrix.json";
 
 interface GroupRow {
   id: string;
@@ -22,8 +24,9 @@ interface MatchDetailRow {
   id: string;
   homeScore: number | null;
   awayScore: number | null;
-  homeTeamId: string;
-  awayTeamId: string;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
+  advancementWinnerId: string | null;
   matchNumber: number;
 }
 
@@ -32,18 +35,25 @@ interface MatchIdRow {
   matchNumber: number;
 }
 
+interface MatrixEntry {
+  advancing: string[];
+  matchups: Record<string, string>;
+}
+
 type GroupKey = Record<string, { winner: string; runner: string; third: string }>;
 
-const THIRD_CANDIDATES: Record<string, string[]> = {
-  A: ["C", "E", "F", "H", "I"],
-  B: ["E", "F", "G", "I", "J"],
-  D: ["B", "E", "F", "I", "J"],
-  E: ["A", "B", "C", "D", "F"],
-  G: ["A", "E", "H", "I", "J"],
-  I: ["C", "D", "F", "G", "H"],
-  K: ["D", "E", "I", "J", "L"],
-  L: ["E", "H", "I", "J", "K"],
-};
+function getMatrixMatchups(advancingGroupLetters: string[]): Record<string, string> | null {
+  const sorted = [...advancingGroupLetters].sort().join(",");
+  const matrix = thirdPlaceMatrix as MatrixEntry[];
+  const entry = matrix.find((e) => [...e.advancing].sort().join(",") === sorted);
+  return entry?.matchups ?? null;
+}
+
+function thirdFromGroup(matchups: Record<string, string>, groupKey: GroupKey, winnerGroup: string): string | null {
+  const thirdGroup = matchups[winnerGroup];
+  if (!thirdGroup || !groupKey[thirdGroup]) return null;
+  return groupKey[thirdGroup].third;
+}
 
 const R32_R16_PAIRINGS = [
   [0, 2],   // 73 vs 75 → 89
@@ -116,43 +126,35 @@ async function getGroupResults(): Promise<{ groupKey: GroupKey; bestThird: strin
   return { groupKey, bestThird: bestThird.map((t) => t.teamId) };
 }
 
-function pickThird(winnerGroup: string, bestThirdGroups: string[], groupKey: GroupKey): string | null {
-  const candidates = THIRD_CANDIDATES[winnerGroup];
-  if (!candidates) return null;
-  for (const cg of bestThirdGroups) {
-    if (candidates.includes(cg) && groupKey[cg]?.third) {
-      return groupKey[cg].third;
-    }
-  }
-  return null;
-}
-
 export async function calculateKnockoutStage() {
   const result = await getGroupResults();
   if ("error" in result) return { error: result.error };
 
   const { groupKey, bestThird } = result;
-  const bestThirdGroups = Object.keys(groupKey).filter((g) =>
+  const advancingGroupLetters = Object.keys(groupKey).filter((g) =>
     bestThird.includes(groupKey[g].third)
   );
 
+  const matchups = getMatrixMatchups(advancingGroupLetters);
+  if (!matchups) return { error: "Keine gültige Drittplatzierte-Matrix für diese Kombination gefunden" };
+
   const r32Matchups: { home: string | null; away: string | null }[] = [
-    { home: groupKey.A.runner, away: groupKey.B.runner },                         // 73: 2A vs 2B
-    { home: groupKey.E.winner, away: pickThird("E", bestThirdGroups, groupKey) }, // 74: 1E vs 3rd
-    { home: groupKey.F.winner, away: groupKey.C.runner },                         // 75: 1F vs 2C
-    { home: groupKey.C.winner, away: groupKey.F.runner },                         // 76: 1C vs 2F
-    { home: groupKey.I.winner, away: pickThird("I", bestThirdGroups, groupKey) }, // 77: 1I vs 3rd
-    { home: groupKey.E.runner, away: groupKey.I.runner },                         // 78: 2E vs 2I
-    { home: groupKey.A.winner, away: pickThird("A", bestThirdGroups, groupKey) }, // 79: 1A vs 3rd
-    { home: groupKey.L.winner, away: pickThird("L", bestThirdGroups, groupKey) }, // 80: 1L vs 3rd
-    { home: groupKey.D.winner, away: pickThird("D", bestThirdGroups, groupKey) }, // 81: 1D vs 3rd
-    { home: groupKey.G.winner, away: pickThird("G", bestThirdGroups, groupKey) }, // 82: 1G vs 3rd
-    { home: groupKey.K.runner, away: groupKey.L.runner },                         // 83: 2K vs 2L
-    { home: groupKey.H.winner, away: groupKey.J.runner },                         // 84: 1H vs 2J
-    { home: groupKey.B.winner, away: pickThird("B", bestThirdGroups, groupKey) }, // 85: 1B vs 3rd
-    { home: groupKey.J.winner, away: groupKey.H.runner },                         // 86: 1J vs 2H
-    { home: groupKey.K.winner, away: pickThird("K", bestThirdGroups, groupKey) }, // 87: 1K vs 3rd
-    { home: groupKey.D.runner, away: groupKey.G.runner },                         // 88: 2D vs 2G
+    { home: groupKey.A.runner, away: groupKey.B.runner },                             // 73: 2A vs 2B
+    { home: groupKey.E.winner, away: thirdFromGroup(matchups, groupKey, "E") },       // 74: 1E vs 3rd
+    { home: groupKey.F.winner, away: groupKey.C.runner },                             // 75: 1F vs 2C
+    { home: groupKey.C.winner, away: groupKey.F.runner },                             // 76: 1C vs 2F
+    { home: groupKey.I.winner, away: thirdFromGroup(matchups, groupKey, "I") },       // 77: 1I vs 3rd
+    { home: groupKey.E.runner, away: groupKey.I.runner },                             // 78: 2E vs 2I
+    { home: groupKey.A.winner, away: thirdFromGroup(matchups, groupKey, "A") },       // 79: 1A vs 3rd
+    { home: groupKey.L.winner, away: thirdFromGroup(matchups, groupKey, "L") },       // 80: 1L vs 3rd
+    { home: groupKey.D.winner, away: thirdFromGroup(matchups, groupKey, "D") },       // 81: 1D vs 3rd
+    { home: groupKey.G.winner, away: thirdFromGroup(matchups, groupKey, "G") },       // 82: 1G vs 3rd
+    { home: groupKey.K.runner, away: groupKey.L.runner },                             // 83: 2K vs 2L
+    { home: groupKey.H.winner, away: groupKey.J.runner },                             // 84: 1H vs 2J
+    { home: groupKey.B.winner, away: thirdFromGroup(matchups, groupKey, "B") },       // 85: 1B vs 3rd
+    { home: groupKey.J.winner, away: groupKey.H.runner },                             // 86: 1J vs 2H
+    { home: groupKey.K.winner, away: thirdFromGroup(matchups, groupKey, "K") },       // 87: 1K vs 3rd
+    { home: groupKey.D.runner, away: groupKey.G.runner },                             // 88: 2D vs 2G
   ];
 
   const r32Matches = await sql<MatchIdRow[]>`SELECT id FROM "Match" WHERE stage = 'ROUND_OF_32'::"Stage" ORDER BY "matchNumber"`;
@@ -178,13 +180,15 @@ const STAGES: { stage: string; next: string; isThirdPlace?: boolean }[] = [
 export async function advanceToNextRound() {
   for (const { stage, next, isThirdPlace } of STAGES) {
     const prevMatches = await sql<MatchDetailRow[]>`
-      SELECT id, "homeScore", "awayScore", "homeTeamId", "awayTeamId", "matchNumber"
+      SELECT id, "homeScore", "awayScore",
+             "homeTeamId", "awayTeamId",
+             "advancementWinnerId", "matchNumber"
       FROM "Match"
       WHERE stage = ${stage}::"Stage"
       ORDER BY "matchNumber"
     `;
 
-    if (prevMatches.length === 0 || prevMatches.some((m) => m.homeScore === null)) continue;
+    if (prevMatches.length === 0 || prevMatches.some((m) => m.homeScore === null || m.homeTeamId === null || m.awayTeamId === null)) continue;
 
     const nextMatches = await sql<MatchIdRow[]>`
       SELECT id FROM "Match"
@@ -195,12 +199,15 @@ export async function advanceToNextRound() {
     if (nextMatches.length === 0) continue;
 
     if (isThirdPlace) {
-      const losers = prevMatches.map((m) => m.homeScore! > m.awayScore! ? m.awayTeamId : m.homeTeamId);
+      const losers = prevMatches.map((m) => {
+        const winner = getMatchWinner(m);
+        return winner === m.homeTeamId ? m.awayTeamId : m.homeTeamId;
+      });
       if (losers[0] && losers[1]) {
         await sql`UPDATE "Match" SET "homeTeamId" = ${losers[0]}, "awayTeamId" = ${losers[1]} WHERE id = ${nextMatches[0].id}`;
       }
     } else {
-      const winners = prevMatches.map((m) => m.homeScore! > m.awayScore! ? m.homeTeamId : m.awayTeamId);
+      const winners = prevMatches.map((m) => getMatchWinner(m));
 
       if (stage === "ROUND_OF_32") {
         for (let i = 0; i < nextMatches.length; i++) {

@@ -38,23 +38,25 @@ model Match {
   stage         Stage
   matchNumber   Int
   startTime     DateTime
-  homeScore     Int?
-  awayScore     Int?
-  isLocked      Boolean    @default(false)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  predictions   Prediction[]
+  homeScore           Int?
+  awayScore           Int?
+  advancementWinnerId String?
+  isLocked            Boolean    @default(false)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  predictions         Prediction[]
 }
 
 model Prediction {
-  id        String   @id @default(cuid())
-  userId    String
-  matchId   String
-  match     Match    @relation(fields: [matchId], references: [id])
-  homeScore Int
-  awayScore Int
-  points    Int?
-  createdAt DateTime @default(now())
+  id                   String   @id @default(cuid())
+  userId               String
+  matchId              String
+  match                Match    @relation(fields: [matchId], references: [id])
+  homeScore            Int
+  awayScore            Int
+  advancementWinnerId  String?
+  points               Int?
+  createdAt            DateTime @default(now())
 
   @@unique([userId, matchId])
 }

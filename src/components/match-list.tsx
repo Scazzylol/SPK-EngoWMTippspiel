@@ -10,6 +10,8 @@ import { savePrediction } from "@/actions/predictions";
 
 interface Match {
   id: string;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
   homeTeam: string;
   homeTeamCode: string | null;
   homeTeamFlag: string | null;
@@ -29,13 +31,20 @@ interface MatchTip {
   userId: string;
   homeScore: number;
   awayScore: number;
+  advancementWinnerId: string | null;
   name: string;
   username: string;
 }
 
+function isKoStage(stage: string) {
+  return stage !== "group" && !stage.startsWith("Gruppe");
+}
+
+type PredictionFields = { home: string; away: string; advancementWinnerId?: string };
+
 export default function MatchList({ userId }: { userId: string }) {
   const [matches, setMatches] = useState<Match[]>([]);
-  const [predictions, setPredictions] = useState<{ [key: string]: { home: string; away: string } }>({});
+  const [predictions, setPredictions] = useState<Record<string, PredictionFields>>({});
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [justSavedIds, setJustSavedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -64,10 +73,10 @@ export default function MatchList({ userId }: { userId: string }) {
       const res = await fetch(`/api/predictions?userId=${userId}`);
       if (res.ok) {
         const data = await res.json();
-        const predMap: { [key: string]: { home: string; away: string } } = {};
+        const predMap: Record<string, PredictionFields> = {};
         const ids = new Set<string>();
         for (const p of data) {
-          predMap[p.matchId] = { home: String(p.homeScore), away: String(p.awayScore) };
+          predMap[p.matchId] = { home: String(p.homeScore), away: String(p.awayScore), advancementWinnerId: p.advancementWinnerId ?? undefined };
           ids.add(p.matchId);
         }
         setPredictions(predMap);
@@ -83,14 +92,25 @@ export default function MatchList({ userId }: { userId: string }) {
     fetchPredictions();
   }, [fetchMatches, fetchPredictions]);
 
-  const handlePredictionChange = (matchId: string, field: "home" | "away", value: string) => {
-    setPredictions((prev) => ({
-      ...prev,
-      [matchId]: {
-        ...prev[matchId],
-        [field]: value,
-      },
-    }));
+  const handlePredictionChange = (matchId: string, field: "home" | "away" | "advancementWinnerId", value: string) => {
+    setPredictions((prev) => {
+      const current = prev[matchId] || { home: "", away: "" };
+      const newHome = field === "home" ? value : current.home;
+      const newAway = field === "away" ? value : current.away;
+      const isDrawNow = newHome !== "" && newAway !== "" && newHome === newAway;
+
+      let advancementWinnerId = current.advancementWinnerId;
+      if (field === "advancementWinnerId") {
+        advancementWinnerId = value;
+      } else if (!isDrawNow) {
+        advancementWinnerId = undefined;
+      }
+
+      return {
+        ...prev,
+        [matchId]: { home: newHome, away: newAway, advancementWinnerId },
+      };
+    });
   };
 
   const handleSave = async (matchId: string) => {
@@ -99,7 +119,14 @@ export default function MatchList({ userId }: { userId: string }) {
 
     setSavingId(matchId);
     setErrorMessage(null);
-    const result = await savePrediction(matchId, parseInt(pred.home), parseInt(pred.away));
+    const homeNum = parseInt(pred.home);
+    const awayNum = parseInt(pred.away);
+    const m = matches.find((x) => x.id === matchId);
+    const isDraw = homeNum === awayNum;
+    const isKO = m && m.homeTeamId && m.awayTeamId && isKoStage(m.stage);
+    // Only pass advancementWinnerId when user tipped a draw in KO stage
+    const advancementId = isKO && isDraw ? (pred.advancementWinnerId || null) : null;
+    const result = await savePrediction(matchId, homeNum, awayNum, advancementId);
     if (result?.error) {
       setErrorMessage(result.error);
     } else {
@@ -195,7 +222,18 @@ export default function MatchList({ userId }: { userId: string }) {
         </div>
       )}
 
-      {Object.entries(groupedMatches).map(([groupName, groupMatches]) => (
+      {Object.entries(groupedMatches).sort(([a], [b]) => {
+        const stageOrder: Record<string, number> = {
+          round_of_32: 1, round_of_16: 2, quarter_finals: 3,
+          semi_finals: 4, third_place: 5, final: 6,
+        };
+        const aIsGroup = a.startsWith("Gruppe");
+        const bIsGroup = b.startsWith("Gruppe");
+        if (aIsGroup && bIsGroup) return a.localeCompare(b, "de");
+        if (aIsGroup) return -1;
+        if (bIsGroup) return 1;
+        return (stageOrder[a] ?? 99) - (stageOrder[b] ?? 99);
+      }).map(([groupName, groupMatches]) => (
         <div key={groupName}>
           <div className="flex items-center gap-3 mb-4">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{getStageLabel(groupName)}</h2>
@@ -209,7 +247,16 @@ export default function MatchList({ userId }: { userId: string }) {
               const isSaved = savedIds.has(match.id);
               const isJustSaved = justSavedIds.has(match.id);
               const isSaving = savingId === match.id;
-              const hasInput = predictions[match.id]?.home && predictions[match.id]?.away;
+              const isKO = match.homeTeamId && match.awayTeamId && isKoStage(match.stage);
+              const pred = predictions[match.id];
+              const homeNum = pred?.home !== "" && pred?.home !== undefined ? parseInt(pred.home) : NaN;
+              const awayNum = pred?.away !== "" && pred?.away !== undefined ? parseInt(pred.away) : NaN;
+              const isDraw = !isNaN(homeNum) && !isNaN(awayNum) && homeNum === awayNum;
+              const hasClearWinner = !isNaN(homeNum) && !isNaN(awayNum) && homeNum !== awayNum;
+              // Advancement required only when tipping a draw in KO stage
+              const needsAdvancement = isKO && isDraw;
+              const hasAdvancement = !needsAdvancement || pred?.advancementWinnerId !== undefined;
+              const hasInput = pred?.home && pred?.away && hasAdvancement;
 
               const hasResult = match.homeScore !== null && match.awayScore !== null;
               const isMatchLocked = match.isLocked || hasResult || new Date(match.matchDate) < new Date();
@@ -267,6 +314,34 @@ export default function MatchList({ userId }: { userId: string }) {
                       ) : (
                         <div className="text-xs text-zinc-400 dark:text-zinc-600 italic text-center px-2">
                           Teams noch nicht bekannt
+                        </div>
+                      )}
+
+                      {/* Advancement picker – nur bei Unentschieden-Tipp */}
+                      {needsAdvancement && !isMatchLocked && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => handlePredictionChange(match.id, "advancementWinnerId", match.homeTeamId!)}
+                            className={`text-xs px-2 py-1 rounded border transition-colors ${
+                              pred?.advancementWinnerId === match.homeTeamId
+                                ? "bg-[#D40000] text-white border-[#D40000]"
+                                : "bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-white/10 hover:border-[#D40000]/50"
+                            }`}
+                          >
+                            {match.homeTeam} weiter
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handlePredictionChange(match.id, "advancementWinnerId", match.awayTeamId!)}
+                            className={`text-xs px-2 py-1 rounded border transition-colors ${
+                              pred?.advancementWinnerId === match.awayTeamId
+                                ? "bg-[#D40000] text-white border-[#D40000]"
+                                : "bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-white/10 hover:border-[#D40000]/50"
+                            }`}
+                          >
+                            {match.awayTeam} weiter
+                          </button>
                         </div>
                       )}
 
@@ -336,9 +411,16 @@ export default function MatchList({ userId }: { userId: string }) {
                                   <span className="text-[#D40000] ml-1 font-bold">(Du)</span>
                                 )}
                               </span>
-                              <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-200">
-                                {tip.homeScore}:{tip.awayScore}
-                              </span>
+                              <div className="flex flex-col items-end">
+                                <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-200">
+                                  {tip.homeScore}:{tip.awayScore}
+                                </span>
+                                {tip.advancementWinnerId && isKoStage(match.stage) && (
+                                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">
+                                    Weiter: {tip.advancementWinnerId === match.homeTeamId ? match.homeTeam : match.awayTeam}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           );
                         })}

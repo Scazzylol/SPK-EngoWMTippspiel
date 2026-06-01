@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db-singleton";
-import { calculatePoints } from "@/lib/scoring";
-
-interface PredictionJoinRow {
-  userId: string;
-  predhome: number;
-  predaway: number;
-  actualhome: number;
-  actualaway: number;
-}
+import { calculatePoints, getMatchWinner } from "@/lib/scoring";
 
 interface UserRow {
   id: string;
@@ -22,6 +14,18 @@ interface TeamRow {
   code: string;
 }
 
+interface PredictionRow {
+  userId: string;
+  predHome: number;
+  predAway: number;
+  predAdvancementId: string | null;
+  actualHome: number | null;
+  actualAway: number | null;
+  actualHomeTeamId: string | null;
+  actualAwayTeamId: string | null;
+  actualAdvancementWinnerId: string | null;
+}
+
 interface LeaderboardEntry {
   rank: number;
   userId: string;
@@ -32,75 +36,76 @@ interface LeaderboardEntry {
 
 export async function GET() {
   try {
-    const predictions = await sql<PredictionJoinRow[]>`
-      SELECT p."userId", p."homeScore" AS predHome, p."awayScore" AS predAway,
-             m."homeScore" AS actualHome, m."awayScore" AS actualAway
+    const [users, teams] = await Promise.all([
+      sql<UserRow[]>`
+        SELECT id, name, "world_champion_id" FROM "better_auth_user" WHERE is_admin = false ORDER BY name ASC
+      `,
+      sql<TeamRow[]>`SELECT id, name, code FROM "Team"`,
+    ]);
+
+    const teamMap: Record<string, TeamRow> = {};
+    for (const t of teams) {
+      teamMap[t.id] = t;
+    }
+
+    const predictions = await sql<PredictionRow[]>`
+      SELECT
+        p."userId",
+        p."homeScore" AS "predHome",
+        p."awayScore" AS "predAway",
+        p."advancementWinnerId" AS "predAdvancementId",
+        m."homeScore" AS "actualHome",
+        m."awayScore" AS "actualAway",
+        m."homeTeamId" AS "actualHomeTeamId",
+        m."awayTeamId" AS "actualAwayTeamId",
+        m."advancementWinnerId" AS "actualAdvancementWinnerId"
       FROM "Prediction" p
       JOIN "Match" m ON p."matchId" = m.id
       WHERE m."homeScore" IS NOT NULL AND m."awayScore" IS NOT NULL
     `;
 
     const userPoints: Record<string, number> = {};
-
     for (const p of predictions) {
-      const pts = calculatePoints(p.predhome, p.predaway, p.actualhome, p.actualaway);
+      const isActualDraw = p.actualHome !== null && p.actualAway !== null && p.actualHome === p.actualAway;
+      const actualAdvancementId = isActualDraw ? p.actualAdvancementWinnerId : null;
+
+      const pts = calculatePoints(p.predHome, p.predAway, p.actualHome, p.actualAway, {
+        predictedAdvancementWinnerId: p.predAdvancementId,
+        actualAdvancementWinnerId: actualAdvancementId,
+      });
       userPoints[p.userId] = (userPoints[p.userId] || 0) + pts;
     }
 
-    const userIds = Object.keys(userPoints);
-    if (userIds.length === 0) {
-      return NextResponse.json([]);
-    }
-
-    const users = await sql<UserRow[]>`
-      SELECT id, name, "world_champion_id" FROM "better_auth_user" WHERE id = ANY(${userIds}) AND is_admin = false
-    `;
-
-    // Get all teams for world champion display
-    const teams = await sql<TeamRow[]>`SELECT id, name, code FROM "Team"`;
-    const teamMap: Record<string, TeamRow> = {};
-    for (const t of teams) {
-      teamMap[t.id] = t;
-    }
-
-    // Find the final match result to determine actual world champion
-    const finalMatch = await sql<{ homeScore: number; awayScore: number; homeTeamId: string | null; awayTeamId: string | null }[]>`
-      SELECT "homeScore", "awayScore", "homeTeamId", "awayTeamId"
+    // Find actual world champion from final match
+    const finalMatch = await sql<{ homeScore: number; awayScore: number; homeTeamId: string | null; awayTeamId: string | null; advancementWinnerId: string | null }[]>`
+      SELECT "homeScore", "awayScore", "homeTeamId", "awayTeamId", "advancementWinnerId"
       FROM "Match"
-      WHERE stage = 'final' AND "homeScore" IS NOT NULL AND "awayScore" IS NOT NULL
-      ORDER BY "matchDate" DESC LIMIT 1
+      WHERE stage = 'FINAL' AND "homeScore" IS NOT NULL AND "awayScore" IS NOT NULL
+      ORDER BY "startTime" DESC LIMIT 1
     `;
 
     let actualChampionId: string | null = null;
     if (finalMatch.length > 0) {
-      const fm = finalMatch[0];
-      if (fm.homeScore > fm.awayScore) {
-        actualChampionId = fm.homeTeamId;
-      } else if (fm.awayScore > fm.homeScore) {
-        actualChampionId = fm.awayTeamId;
-      }
+      actualChampionId = getMatchWinner(finalMatch[0]);
     }
 
-    const userNames: Record<string, string> = {};
     const userWorldChampion: Record<string, string | null> = {};
     for (const u of users) {
-      userNames[u.id] = u.name;
       userWorldChampion[u.id] = u.world_champion_id;
     }
 
-    const leaderboard: LeaderboardEntry[] = userIds
-      .map((id) => {
-        let pts = userPoints[id];
-        // +15 bonus if world champion prediction was correct
-        if (actualChampionId && userWorldChampion[id] === actualChampionId) {
+    const leaderboard: LeaderboardEntry[] = users
+      .map((u) => {
+        let pts = userPoints[u.id] || 0;
+        if (actualChampionId && userWorldChampion[u.id] === actualChampionId) {
           pts += 15;
         }
         return {
-          userId: id,
-          name: userNames[id] || "Unbekannt",
+          userId: u.id,
+          name: u.name,
           points: pts,
-          worldChampionTeam: userWorldChampion[id] && teamMap[userWorldChampion[id]]
-            ? { id: userWorldChampion[id], name: teamMap[userWorldChampion[id]].name, code: teamMap[userWorldChampion[id]].code }
+          worldChampionTeam: userWorldChampion[u.id] && teamMap[userWorldChampion[u.id]!]
+            ? { id: userWorldChampion[u.id]!, name: teamMap[userWorldChampion[u.id]!]!.name, code: teamMap[userWorldChampion[u.id]!]!.code }
             : null,
         };
       })

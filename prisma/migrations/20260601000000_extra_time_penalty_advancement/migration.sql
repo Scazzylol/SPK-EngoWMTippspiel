@@ -1,0 +1,1 @@
+ALTER TABLE "Match" ADD COLUMN IF NOT EXISTS "advancementWinnerId" TEXT;

@@ -192,46 +192,46 @@ const GROUP_MATCH_TIMES: Record<string, string[]> = {
   ],
 };
 
-// UTC times for knockout matches (matchNumber order 73-104)
+// MESZ (UTC+2) times for knockout matches (matchNumber order 73-104)
 const KNOCKOUT_MATCHES = [
-  // Round of 32 (Jun 29 - Jul 4)
-  { stage: Stage.ROUND_OF_32, time: "2026-06-29T19:00:00Z" },  // #73
-  { stage: Stage.ROUND_OF_32, time: "2026-06-29T22:00:00Z" },  // #74
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T01:00:00Z" },  // #75
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T19:00:00Z" },  // #76
-  { stage: Stage.ROUND_OF_32, time: "2026-06-30T22:00:00Z" },  // #77
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T01:00:00Z" },  // #78
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T20:00:00Z" },  // #79
-  { stage: Stage.ROUND_OF_32, time: "2026-07-01T23:00:00Z" },  // #80
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T19:00:00Z" },  // #81
-  { stage: Stage.ROUND_OF_32, time: "2026-07-02T22:00:00Z" },  // #82
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T01:00:00Z" },  // #83
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T19:00:00Z" },  // #84
-  { stage: Stage.ROUND_OF_32, time: "2026-07-03T22:00:00Z" },  // #85
-  { stage: Stage.ROUND_OF_32, time: "2026-07-04T01:00:00Z" },  // #86
-  { stage: Stage.ROUND_OF_32, time: "2026-07-04T19:00:00Z" },  // #87
-  { stage: Stage.ROUND_OF_32, time: "2026-07-04T22:00:00Z" },  // #88
+  // Round of 32 (Jun 28 - Jul 3)
+  { stage: Stage.ROUND_OF_32, time: "2026-06-28T21:00:00+02:00" },  // #73
+  { stage: Stage.ROUND_OF_32, time: "2026-06-29T22:30:00+02:00" },  // #74
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T02:00:00+02:00" },  // #75
+  { stage: Stage.ROUND_OF_32, time: "2026-06-29T19:00:00+02:00" },  // #76
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T23:00:00+02:00" },  // #77
+  { stage: Stage.ROUND_OF_32, time: "2026-06-30T19:00:00+02:00" },  // #78
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T02:00:00+02:00" },  // #79
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T18:00:00+02:00" },  // #80
+  { stage: Stage.ROUND_OF_32, time: "2026-07-02T02:00:00+02:00" },  // #81
+  { stage: Stage.ROUND_OF_32, time: "2026-07-01T22:00:00+02:00" },  // #82
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T01:00:00+02:00" },  // #83
+  { stage: Stage.ROUND_OF_32, time: "2026-07-02T21:00:00+02:00" },  // #84
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T05:00:00+02:00" },  // #85
+  { stage: Stage.ROUND_OF_32, time: "2026-07-04T00:00:00+02:00" },  // #86
+  { stage: Stage.ROUND_OF_32, time: "2026-07-04T03:30:00+02:00" },  // #87
+  { stage: Stage.ROUND_OF_32, time: "2026-07-03T20:00:00+02:00" },  // #88
   // Round of 16 (Jul 4 - Jul 7)
-  { stage: Stage.ROUND_OF_16, time: "2026-07-04T17:00:00Z" },  // #89
-  { stage: Stage.ROUND_OF_16, time: "2026-07-04T21:00:00Z" },  // #90
-  { stage: Stage.ROUND_OF_16, time: "2026-07-05T20:00:00Z" },  // #91
-  { stage: Stage.ROUND_OF_16, time: "2026-07-06T00:00:00Z" },  // #92
-  { stage: Stage.ROUND_OF_16, time: "2026-07-06T19:00:00Z" },  // #93
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T00:00:00Z" },  // #94
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T16:00:00Z" },  // #95
-  { stage: Stage.ROUND_OF_16, time: "2026-07-07T20:00:00Z" },  // #96
-  // Quarter-finals (Jul 9 - Jul 12)
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-09T20:00:00Z" },  // #97
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-10T19:00:00Z" },  // #98
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-11T21:00:00Z" },  // #99
-  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T00:00:00Z" },  // #100
+  { stage: Stage.ROUND_OF_16, time: "2026-07-04T23:00:00+02:00" },  // #89
+  { stage: Stage.ROUND_OF_16, time: "2026-07-04T19:00:00+02:00" },  // #90
+  { stage: Stage.ROUND_OF_16, time: "2026-07-05T22:00:00+02:00" },  // #91
+  { stage: Stage.ROUND_OF_16, time: "2026-07-06T02:00:00+02:00" },  // #92
+  { stage: Stage.ROUND_OF_16, time: "2026-07-06T21:00:00+02:00" },  // #93
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T02:00:00+02:00" },  // #94
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T18:00:00+02:00" },  // #95
+  { stage: Stage.ROUND_OF_16, time: "2026-07-07T22:00:00+02:00" },  // #96
+  // Quarter-finals (Jul 9 - Jul 11)
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-09T22:00:00+02:00" },  // #97
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-10T21:00:00+02:00" },  // #98
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-11T23:00:00+02:00" },  // #99
+  { stage: Stage.QUARTER_FINALS, time: "2026-07-12T03:00:00+02:00" },  // #100 (war 02:00 MESZ)
   // Semi-finals (Jul 14 - Jul 15)
-  { stage: Stage.SEMI_FINALS, time: "2026-07-14T10:00:00Z" },  // #101
-  { stage: Stage.SEMI_FINALS, time: "2026-07-15T19:00:00Z" },  // #102
+  { stage: Stage.SEMI_FINALS, time: "2026-07-14T21:00:00+02:00" },  // #101 (war 12:00 MESZ)
+  { stage: Stage.SEMI_FINALS, time: "2026-07-15T21:00:00+02:00" },  // #102
   // Third place (Jul 18)
-  { stage: Stage.THIRD_PLACE, time: "2026-07-18T19:00:00Z" },  // #103
+  { stage: Stage.THIRD_PLACE, time: "2026-07-18T23:00:00+02:00" },  // #103 (war 21:00 MESZ)
   // Final (Jul 19)
-  { stage: Stage.FINAL, time: "2026-07-19T19:00:00Z" },  // #104
+  { stage: Stage.FINAL, time: "2026-07-19T21:00:00+02:00" },  // #104
 ];
 
 async function main() {

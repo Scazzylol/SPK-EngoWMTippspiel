@@ -8,21 +8,27 @@ const schema = z.object({
   matchId: z.string().min(1),
   homeScore: z.number().int().min(0).max(99),
   awayScore: z.number().int().min(0).max(99),
+  advancementWinnerId: z.string().nullable().optional(),
 });
 
-export async function savePrediction(matchId: string, homeScore: number, awayScore: number) {
+export async function savePrediction(
+  matchId: string,
+  homeScore: number,
+  awayScore: number,
+  advancementWinnerId?: string | null
+) {
   const session = await getSession();
   if (!session?.user) {
     return { error: "Nicht eingeloggt" };
   }
 
-  const parsed = schema.safeParse({ matchId, homeScore, awayScore });
+  const parsed = schema.safeParse({ matchId, homeScore, awayScore, advancementWinnerId });
   if (!parsed.success) {
     return { error: "Ungültige Eingabe" };
   }
 
   try {
-    const [match] = await sql`SELECT "isLocked", "startTime", "homeTeamId", "awayTeamId" FROM "Match" WHERE id = ${matchId}`;
+    const [match] = await sql`SELECT "isLocked", "startTime", "homeTeamId", "awayTeamId", stage FROM "Match" WHERE id = ${matchId}`;
     if (!match) return { error: "Spiel nicht gefunden" };
     if (!match.homeTeamId || !match.awayTeamId) {
       return { error: "Teams für dieses Spiel stehen noch nicht fest" };
@@ -34,9 +40,16 @@ export async function savePrediction(matchId: string, homeScore: number, awaySco
     const [existing] = await sql`SELECT id FROM "Prediction" WHERE "userId" = ${session.user.id} AND "matchId" = ${matchId}`;
 
     if (existing) {
-      await sql`UPDATE "Prediction" SET "homeScore" = ${homeScore}, "awayScore" = ${awayScore} WHERE id = ${existing.id}`;
+      await sql`
+        UPDATE "Prediction"
+        SET "homeScore" = ${homeScore}, "awayScore" = ${awayScore}, "advancementWinnerId" = ${advancementWinnerId ?? null}
+        WHERE id = ${existing.id}
+      `;
     } else {
-      await sql`INSERT INTO "Prediction" (id, "userId", "matchId", "homeScore", "awayScore") VALUES (gen_random_uuid(), ${session.user.id}, ${matchId}, ${homeScore}, ${awayScore})`;
+      await sql`
+        INSERT INTO "Prediction" (id, "userId", "matchId", "homeScore", "awayScore", "advancementWinnerId")
+        VALUES (gen_random_uuid(), ${session.user.id}, ${matchId}, ${homeScore}, ${awayScore}, ${advancementWinnerId ?? null})
+      `;
     }
 
     return { success: true };
