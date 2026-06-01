@@ -22,20 +22,17 @@ const errorTranslations: Record<string, string> = {
   "Username is invalid": "Ungültiger Name (nur Buchstaben, Zahlen, _ und .)",
   "Password too short": "Passwort zu kurz (mind. 8 Zeichen)",
   "Password too long": "Passwort zu lang",
+  "User already exists": "Benutzer existiert bereits",
   "User already exists. Use another email.": "Benutzer existiert bereits",
   "Failed to create user": "Fehler bei der Registrierung",
   "Failed to create session": "Fehler beim Einloggen",
-  "Invalid email": "Ungültige Email",
+  "Invalid email": "Ungültige E-Mail",
 };
 
 function translateError(err: any): string {
   if (!err) return "";
   const msg = err.message || (typeof err === "string" ? err : "");
-  const detail = err.code || err.status || "";
-  const translated = errorTranslations[msg];
-  if (translated) return translated;
-  if (msg) return msg;
-  return `Fehler ${detail ? `(${detail})` : ""}`.trim() || "Etwas ist schiefgelaufen";
+  return errorTranslations[msg] || msg || "Etwas ist schiefgelaufen";
 }
 
 function LoginForm() {
@@ -71,7 +68,7 @@ function LoginForm() {
           router.push("/matches");
           router.refresh();
         } else {
-          setError(result?.error ? JSON.stringify(result.error).slice(0, 200) : "Unbekannter Fehler");
+          setError(translateError(result?.error));
         }
       } else {
         const placeholderEmail = `${username}@wmtippspiel.app`;
@@ -86,11 +83,11 @@ function LoginForm() {
           router.push("/matches");
           router.refresh();
         } else {
-          setError(result?.error ? JSON.stringify(result.error).slice(0, 200) : "Unbekannter Fehler");
+          setError(translateError(result?.error));
         }
       }
     } catch (err: any) {
-      setError(err?.message || JSON.stringify(err).slice(0, 200) || "Unbekannter Fehler");
+      setError(err.message || "Etwas ist schiefgelaufen");
     } finally {
       setLoading(false);
     }
