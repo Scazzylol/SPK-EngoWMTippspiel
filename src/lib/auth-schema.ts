@@ -10,6 +10,7 @@ export const user = pgTable("better_auth_user", {
   username: text("username").unique(),
   displayUsername: text("display_username"),
   isAdmin: boolean("is_admin").default(false).notNull(),
+  worldChampionId: text("world_champion_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

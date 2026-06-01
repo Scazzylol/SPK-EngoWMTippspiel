@@ -17,7 +17,7 @@ export default async function Home() {
     {
       icon: Trophy,
       title: "Punkte sammeln",
-      desc: "Für jedes richtige Ergebnis, die richtige Tordifferenz oder den richtigen Sieger gibt's Punkte.",
+      desc: "3 Punkte für das exakte Ergebnis, 1 Punkt für die richtige Tendenz – so einfach ist das.",
     },
     {
       icon: Users,

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import MatchList from "@/components/match-list";
+import WorldChampionPicker from "@/components/world-champion-picker";
 import { ScoringInfo } from "@/components/scoring-info";
 
 export default async function MatchesPage() {
@@ -29,6 +30,7 @@ export default async function MatchesPage() {
           </p>
           <ScoringInfo className="mt-3" />
         </div>
+        <WorldChampionPicker userId={session.user.id} />
         <MatchList userId={session.user.id} />
       </div>
     </div>

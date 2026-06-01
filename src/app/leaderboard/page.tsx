@@ -1,12 +1,14 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { ScoringInfo } from "@/components/scoring-info";
+import { getFlagUrl } from "@/lib/flags";
 
 interface LeaderboardEntry {
   rank: number;
   userId: string;
   name: string;
   points: number;
+  worldChampionTeam: { id: string; name: string; code: string } | null;
 }
 
 async function getLeaderboard(): Promise<LeaderboardEntry[]> {
@@ -67,6 +69,12 @@ export default async function LeaderboardPage() {
                   <div className="text-center">
                     <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{leaderboard[1]?.name}</div>
                     <div className="text-xs text-zinc-500 mt-0.5">{leaderboard[1]?.points} Punkte</div>
+                    {leaderboard[1]?.worldChampionTeam && (
+                      <div className="flex items-center justify-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 mt-0.5">
+                        <img src={getFlagUrl(leaderboard[1].worldChampionTeam.code)} alt="" className="w-3 h-2 object-contain" />
+                        {leaderboard[1].worldChampionTeam.name}
+                      </div>
+                    )}
                   </div>
                   <div className="w-24 h-16 rounded-t-xl bg-gradient-to-b from-zinc-200 to-zinc-300 dark:from-zinc-400/20 dark:to-zinc-600/20 border border-zinc-300 dark:border-zinc-500/20 flex items-center justify-center text-3xl">
                     🥈
@@ -80,6 +88,12 @@ export default async function LeaderboardPage() {
                   <div className="text-center">
                     <div className="text-sm font-bold text-zinc-900 dark:text-white">{leaderboard[0]?.name}</div>
                     <div className="text-xs text-yellow-600 dark:text-yellow-500 font-medium mt-0.5">{leaderboard[0]?.points} Punkte</div>
+                    {leaderboard[0]?.worldChampionTeam && (
+                      <div className="flex items-center justify-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 mt-0.5">
+                        <img src={getFlagUrl(leaderboard[0].worldChampionTeam.code)} alt="" className="w-3 h-2 object-contain" />
+                        {leaderboard[0].worldChampionTeam.name}
+                      </div>
+                    )}
                   </div>
                   <div className="w-28 h-20 rounded-t-xl bg-gradient-to-b from-yellow-200 to-yellow-300 dark:from-yellow-400/20 dark:to-yellow-600/20 border border-yellow-300 dark:border-yellow-500/20 flex items-center justify-center text-4xl shadow-lg shadow-yellow-500/10">
                     🥇
@@ -93,6 +107,12 @@ export default async function LeaderboardPage() {
                   <div className="text-center">
                     <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{leaderboard[2]?.name}</div>
                     <div className="text-xs text-zinc-500 mt-0.5">{leaderboard[2]?.points} Punkte</div>
+                    {leaderboard[2]?.worldChampionTeam && (
+                      <div className="flex items-center justify-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 mt-0.5">
+                        <img src={getFlagUrl(leaderboard[2].worldChampionTeam.code)} alt="" className="w-3 h-2 object-contain" />
+                        {leaderboard[2].worldChampionTeam.name}
+                      </div>
+                    )}
                   </div>
                   <div className="w-24 h-12 rounded-t-xl bg-gradient-to-b from-orange-200 to-orange-300 dark:from-orange-400/20 dark:to-orange-600/20 border border-orange-300 dark:border-orange-500/20 flex items-center justify-center text-3xl">
                     🥉
@@ -139,6 +159,12 @@ export default async function LeaderboardPage() {
                             {entry.name.charAt(0).toUpperCase()}
                           </div>
                           <span className="font-medium text-zinc-800 dark:text-zinc-200">{entry.name}</span>
+                          {entry.worldChampionTeam && (
+                            <span className="inline-flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                              <img src={getFlagUrl(entry.worldChampionTeam.code)} alt="" className="w-3.5 h-2.5 object-contain" />
+                              {entry.worldChampionTeam.name}
+                            </span>
+                          )}
                           {isCurrentUser && (
                             <span className="text-xs bg-[#D40000]/10 dark:bg-[#D40000]/20 text-[#D40000] px-2 py-0.5 rounded-full font-medium border border-[#D40000]/20 dark:border-[#D40000]/30">
                               Du

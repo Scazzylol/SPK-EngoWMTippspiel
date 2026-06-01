@@ -2,9 +2,8 @@ import { Info } from "lucide-react";
 
 export function ScoringInfo({ className }: { className?: string }) {
   const rules = [
-    { points: 5, label: "Exaktes Ergebnis" },
-    { points: 3, label: "Richtiger Sieger + Tordifferenz" },
-    { points: 2, label: "Richtiger Sieger / Tendenz" },
+    { points: 3, label: "Exaktes Ergebnis" },
+    { points: 1, label: "Richtige Tendenz (Sieger / Unentschieden)" },
     { points: 0, label: "Falscher Tipp" },
   ];
 
@@ -27,7 +26,7 @@ export function ScoringInfo({ className }: { className?: string }) {
               <span className="text-zinc-500 dark:text-zinc-400">{r.label}</span>
               <span
                 className={`font-bold tabular-nums ${
-                  r.points === 5
+                  r.points === 3
                     ? "text-green-600 dark:text-green-400"
                     : r.points === 0
                       ? "text-zinc-400 dark:text-zinc-500"

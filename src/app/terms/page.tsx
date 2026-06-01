@@ -78,11 +78,16 @@ export default function TermsPage() {
             </h2>
             <p>Die Punkte werden wie folgt vergeben:</p>
             <ul className="list-disc pl-6 space-y-1">
-              <li>5 Punkte: Exaktes Ergebnis (Torverhältnis stimmt genau)</li>
-              <li>3 Punkte: Richtige Tordifferenz bei richtigem Sieger</li>
-              <li>2 Punkte: Richtiger Sieger (oder Unentschieden) bei falscher Differenz</li>
-              <li>0 Punkte: Falscher Sieger oder falsche Tendenz</li>
+              <li>3 Punkte: Exaktes Ergebnis (Torverhältnis stimmt genau)</li>
+              <li>1 Punkt: Richtige Tendenz (richtiger Sieger oder richtiges Unentschieden)</li>
+              <li>0 Punkte: Falscher Tipp</li>
             </ul>
+            <p>
+              Die Tendenz gilt als richtig, wenn der getippte Sieger (Heim/Auswärts) gewinnt
+              oder wenn ein getipptes Unentschieden tatsächlich unentschieden endet – unabhängig
+              von der genauen Tordifferenz. Beispiel: Ein getipptes 3:0 bei tatsächlichem 3:1
+              ergibt 1 Punkt (Tendenz stimmt, aber nicht exakt).
+            </p>
             <p>
               Bei Spielen, die in der K.O.-Phase nach Verlängerung oder Elfmeterschießen
               entschieden werden, zählt für die Tippabgabe der Endstand nach Verlängerung

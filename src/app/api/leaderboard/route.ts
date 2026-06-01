@@ -13,6 +13,13 @@ interface PredictionJoinRow {
 interface UserRow {
   id: string;
   name: string;
+  world_champion_id: string | null;
+}
+
+interface TeamRow {
+  id: string;
+  name: string;
+  code: string;
 }
 
 interface LeaderboardEntry {
@@ -20,6 +27,7 @@ interface LeaderboardEntry {
   userId: string;
   name: string;
   points: number;
+  worldChampionTeam: { id: string; name: string; code: string } | null;
 }
 
 export async function GET() {
@@ -45,20 +53,57 @@ export async function GET() {
     }
 
     const users = await sql<UserRow[]>`
-      SELECT id, name FROM "better_auth_user" WHERE id = ANY(${userIds}) AND is_admin = false
+      SELECT id, name, "world_champion_id" FROM "better_auth_user" WHERE id = ANY(${userIds}) AND is_admin = false
     `;
 
+    // Get all teams for world champion display
+    const teams = await sql<TeamRow[]>`SELECT id, name, code FROM "Team"`;
+    const teamMap: Record<string, TeamRow> = {};
+    for (const t of teams) {
+      teamMap[t.id] = t;
+    }
+
+    // Find the final match result to determine actual world champion
+    const finalMatch = await sql<{ homeScore: number; awayScore: number; homeTeamId: string | null; awayTeamId: string | null }[]>`
+      SELECT "homeScore", "awayScore", "homeTeamId", "awayTeamId"
+      FROM "Match"
+      WHERE stage = 'final' AND "homeScore" IS NOT NULL AND "awayScore" IS NOT NULL
+      ORDER BY "matchDate" DESC LIMIT 1
+    `;
+
+    let actualChampionId: string | null = null;
+    if (finalMatch.length > 0) {
+      const fm = finalMatch[0];
+      if (fm.homeScore > fm.awayScore) {
+        actualChampionId = fm.homeTeamId;
+      } else if (fm.awayScore > fm.homeScore) {
+        actualChampionId = fm.awayTeamId;
+      }
+    }
+
     const userNames: Record<string, string> = {};
+    const userWorldChampion: Record<string, string | null> = {};
     for (const u of users) {
       userNames[u.id] = u.name;
+      userWorldChampion[u.id] = u.world_champion_id;
     }
 
     const leaderboard: LeaderboardEntry[] = userIds
-      .map((id) => ({
-        userId: id,
-        name: userNames[id] || "Unbekannt",
-        points: userPoints[id],
-      }))
+      .map((id) => {
+        let pts = userPoints[id];
+        // +15 bonus if world champion prediction was correct
+        if (actualChampionId && userWorldChampion[id] === actualChampionId) {
+          pts += 15;
+        }
+        return {
+          userId: id,
+          name: userNames[id] || "Unbekannt",
+          points: pts,
+          worldChampionTeam: userWorldChampion[id] && teamMap[userWorldChampion[id]]
+            ? { id: userWorldChampion[id], name: teamMap[userWorldChampion[id]].name, code: teamMap[userWorldChampion[id]].code }
+            : null,
+        };
+      })
       .sort((a, b) => b.points - a.points)
       .map((entry, index) => ({ rank: index + 1, ...entry }));
 

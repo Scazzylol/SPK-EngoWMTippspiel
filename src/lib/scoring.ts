@@ -6,20 +6,19 @@ export function calculatePoints(
 ): number {
   if (actualHome === null || actualAway === null) return 0;
 
+  // Exact result → 3 points
   if (predictedHome === actualHome && predictedAway === actualAway) {
-    return 5;
+    return 3;
   }
 
-  const predictedWinner = predictedHome > predictedAway ? "home" : predictedHome < predictedAway ? "away" : "draw";
-  const actualWinner = actualHome > actualAway ? "home" : actualHome < actualAway ? "away" : "draw";
+  const predictedWinner =
+    predictedHome > predictedAway ? "home" : predictedHome < predictedAway ? "away" : "draw";
+  const actualWinner =
+    actualHome > actualAway ? "home" : actualHome < actualAway ? "away" : "draw";
 
+  // Correct tendency (winner/draw) → 1 point
   if (predictedWinner === actualWinner) {
-    const predictedDiff = Math.abs(predictedHome - predictedAway);
-    const actualDiff = Math.abs(actualHome - actualAway);
-    if (predictedDiff === actualDiff && predictedWinner !== "draw") {
-      return 3;
-    }
-    return 2;
+    return 1;
   }
 
   return 0;

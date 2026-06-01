@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { getSession } from "@/lib/session";
 import { isAdmin } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { logout } from "@/actions/auth";
+import { LogoutButton } from "@/components/logout-button";
 import { SparkasseLogo } from "@/components/sparkasse-logo";
 import { CircleDot, Trophy, Shield } from "lucide-react";
 
@@ -52,11 +52,7 @@ export default async function Navbar() {
               <span className="text-sm text-zinc-500 px-2">
                 {user.name}
               </span>
-              <form action={logout}>
-                <Button variant="ghost" size="sm" type="submit" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5">
-                  Ausloggen
-                </Button>
-              </form>
+              <LogoutButton />
             </>
           ) : (
             <Link href="/login">
