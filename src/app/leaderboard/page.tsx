@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { ScoringInfo } from "@/components/scoring-info";
 
 interface LeaderboardEntry {
   rank: number;
@@ -42,6 +43,7 @@ export default async function LeaderboardPage() {
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">
             Wer hat die besten Tipps bei der WM 2026?
           </p>
+          <ScoringInfo className="mt-3" />
         </div>
 
         {leaderboard.length === 0 ? (

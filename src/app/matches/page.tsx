@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import MatchList from "@/components/match-list";
+import { ScoringInfo } from "@/components/scoring-info";
 
 export default async function MatchesPage() {
   const session = await getSession();
@@ -26,6 +27,7 @@ export default async function MatchesPage() {
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">
             Tipp die Ergebnisse der WM 2026 – von der Gruppenphase bis zum Finale.
           </p>
+          <ScoringInfo className="mt-3" />
         </div>
         <MatchList userId={session.user.id} />
       </div>

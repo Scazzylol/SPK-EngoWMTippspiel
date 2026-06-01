@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
 import { Trophy, Target, Users, ArrowRight } from "lucide-react";
+import { ScoringInfo } from "@/components/scoring-info";
 
 export default async function Home() {
   const session = await getSession();
@@ -26,19 +27,18 @@ export default async function Home() {
   ];
 
   return (
-    <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/20 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-[#D40000]/10 via-transparent to-transparent" />
+    <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-background">
+      {/* Red accent overlays */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#D40000]/10 dark:from-[#D40000]/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-[#D40000]/5 dark:from-[#D40000]/10 via-transparent to-transparent" />
 
-      {/* Football pitch pattern */}
+      {/* Grid pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `
-            linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px),
-            linear-gradient(0deg, rgba(255,255,255,0.5) 1px, transparent 1px)
+            linear-gradient(90deg, rgba(0,0,0,0.5) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(0,0,0,0.5) 1px, transparent 1px)
           `,
           backgroundSize: "60px 60px",
         }}
@@ -48,7 +48,7 @@ export default async function Home() {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] px-4 py-20">
         <div className="max-w-3xl text-center space-y-10">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-zinc-400 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-sm">
             <span className="h-2 w-2 rounded-full bg-[#D40000] animate-pulse" />
             FIFA World Cup 2026
           </div>
@@ -65,13 +65,13 @@ export default async function Home() {
 
           {/* Headline */}
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground">
               WM Tippspiel{" "}
-              <span className="bg-gradient-to-r from-red-300 via-[#D40000] to-red-700 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-red-400 via-[#D40000] to-red-700 bg-clip-text text-transparent">
                 2026
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-zinc-400 max-w-xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
               Das offizielle Tippspiel der Sparkasse Engen-Gottmadingen – tippe mit, sammle Punkte und werde
               Tippkönig!
             </p>
@@ -104,7 +104,7 @@ export default async function Home() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="h-12 px-8 text-base border-white/20 text-zinc-300 hover:bg-white/5 hover:text-white"
+                    className="h-12 px-8 text-base"
                   >
                     Anmelden
                   </Button>
@@ -121,8 +121,8 @@ export default async function Home() {
               { label: "Stadien", value: "16" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-zinc-500 mt-1">{stat.label}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -134,25 +134,33 @@ export default async function Home() {
             {features.map((f) => (
               <div
                 key={f.title}
-                className="group relative rounded-xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition-all hover:bg-white/[0.06] hover:border-white/20"
+                className="group relative rounded-xl border border-border bg-card p-6 backdrop-blur-sm transition-all hover:bg-accent hover:border-border"
               >
                 <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#D40000]/10 text-[#D40000]">
                   <f.icon className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold text-white mb-2">{f.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{f.desc}</p>
+                <h3 className="font-semibold text-card-foreground mb-2">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Scoring info */}
+        <div className="mt-8 sm:mt-12 flex items-center justify-center">
+          <ScoringInfo />
+        </div>
+
         {/* Footer */}
-        <div className="mt-20 sm:mt-28 text-center">
-          <p className="text-xs text-zinc-600">
+        <div className="mt-12 sm:mt-16 text-center">
+          <p className="text-xs text-muted-foreground">
             Mit Nutzung erklärst du dich mit den{" "}
-            <span className="underline underline-offset-2 cursor-pointer hover:text-zinc-400 transition-colors">
+            <Link
+              href="/terms"
+              className="text-[#D40000] hover:text-[#B00000] underline underline-offset-2 transition-colors font-medium"
+            >
               Teilnahmebedingungen
-            </span>{" "}
+            </Link>{" "}
             einverstanden.
           </p>
         </div>

@@ -62,7 +62,10 @@ console.log("Test-User: test1-test10 mit Passwort 'test1234'");
 console.log("Admin-User: admin mit Passwort 'admin123'");
 
 async function hashPassword(password) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
+  // Must match @better-auth/utils/password exactly:
+  // salt = hex.encode(crypto.getRandomValues(new Uint8Array(16)))
+  // key = scryptAsync(password, salt_string, ...) where salt is a hex string
+  const salt = hex.encode(crypto.getRandomValues(new Uint8Array(16)));
   const key = await scryptAsync(password.normalize("NFKC"), salt, {
     N: 16384,
     r: 16,
@@ -70,5 +73,5 @@ async function hashPassword(password) {
     dkLen: 64,
     maxmem: 128 * 16384 * 16 * 2,
   });
-  return `${hex.encode(salt)}:${hex.encode(key)}`;
+  return `${salt}:${hex.encode(key)}`;
 }
