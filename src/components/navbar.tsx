@@ -6,6 +6,7 @@ import { isAdmin } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LogoutButton } from "@/components/logout-button";
 import { SparkasseLogo } from "@/components/sparkasse-logo";
+import { MobileNav } from "@/components/mobile-nav";
 import { CircleDot, Trophy, Shield } from "lucide-react";
 
 export default async function Navbar() {
@@ -25,34 +26,41 @@ export default async function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
-              <Link
-                href="/matches"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
-              >
-                <CircleDot className="h-4 w-4" />
-                Spiele
-              </Link>
-              <Link
-                href="/leaderboard"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
-              >
-                <Trophy className="h-4 w-4" />
-                Rangliste
-              </Link>
-              {admin && (
+              {/* Desktop nav */}
+              <div className="hidden md:flex items-center gap-1.5">
                 <Link
-                  href="/admin"
+                  href="/matches"
                   className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
                 >
-                  <Shield className="h-4 w-4" />
-                  Admin
+                  <CircleDot className="h-4 w-4" />
+                  Spiele
                 </Link>
-              )}
-              <Separator orientation="vertical" className="h-5 bg-zinc-200 dark:bg-white/10" />
-              <span className="text-sm text-zinc-500 px-2">
-                {user.name}
-              </span>
-              <LogoutButton />
+                <Link
+                  href="/leaderboard"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                >
+                  <Trophy className="h-4 w-4" />
+                  Rangliste
+                </Link>
+                {admin && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
+                <Separator orientation="vertical" className="h-5 bg-zinc-200 dark:bg-white/10" />
+                <span className="text-sm text-zinc-500 px-2">
+                  {user.name}
+                </span>
+                <LogoutButton />
+              </div>
+              {/* Mobile nav */}
+              <div className="md:hidden">
+                <MobileNav isAdmin={admin} userName={user.name} />
+              </div>
             </>
           ) : (
             <Link href="/login">

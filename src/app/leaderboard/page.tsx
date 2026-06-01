@@ -57,7 +57,7 @@ export default async function LeaderboardPage() {
           <div className="space-y-8">
             {/* Top 3 Podium – nur wenn Punkte vergeben wurden */}
             {leaderboard.length >= 3 && leaderboard.some((e) => e.points > 0) && (
-              <div className="flex items-end justify-center gap-4 sm:gap-6 py-8">
+              <div className="flex items-end justify-center gap-3 sm:gap-6 py-6 sm:py-8 flex-wrap">
                 {/* 2nd */}
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-500 dark:from-zinc-300 dark:to-zinc-500 flex items-center justify-center text-2xl font-bold text-zinc-800 ring-2 ring-zinc-400/50">
@@ -151,19 +151,19 @@ export default async function LeaderboardPage() {
                             {entry.rank <= 3 ? (entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : "🥉") : entry.rank}
                           </span>
                         </div>
-                        <div className="col-span-6 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                        <div className="col-span-6 flex items-center gap-2 min-w-0">
+                          <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300 flex-shrink-0">
                             {entry.name.charAt(0).toUpperCase()}
                           </div>
-                          <span className="font-medium text-zinc-800 dark:text-zinc-200">{entry.name}</span>
+                          <span className="font-medium text-zinc-800 dark:text-zinc-200 truncate">{entry.name}</span>
                           {entry.worldChampionTeam && (
-                            <span className="inline-flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 px-1.5 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 px-1.5 py-0.5 rounded-full flex-shrink-0">
                               <img src={getFlagUrl(entry.worldChampionTeam.code)} alt="" className="w-3.5 h-2.5 object-contain" />
-                              {entry.worldChampionTeam.name}
+                              <span className="hidden sm:inline">{entry.worldChampionTeam.name}</span>
                             </span>
                           )}
                           {isCurrentUser && (
-                            <span className="text-xs bg-[#D40000]/10 dark:bg-[#D40000]/20 text-[#D40000] px-2 py-0.5 rounded-full font-medium border border-[#D40000]/20 dark:border-[#D40000]/30">
+                            <span className="text-xs bg-[#D40000]/10 dark:bg-[#D40000]/20 text-[#D40000] px-2 py-0.5 rounded-full font-medium border border-[#D40000]/20 dark:border-[#D40000]/30 flex-shrink-0">
                               Du
                             </span>
                           )}

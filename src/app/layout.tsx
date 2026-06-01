@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   description: "Tipp die Ergebnisse der WM 2026 und werde Meister!",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+} as const;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,7 +35,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-x-hidden">
         <ThemeProvider>
           <div className="relative z-10 flex flex-col min-h-full">
             <Navbar />

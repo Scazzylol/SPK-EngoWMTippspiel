@@ -217,9 +217,9 @@ export default function AdminPanel() {
           </div>
         )}
 
-        <div className="mb-8 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm p-5">
-          <div className="flex items-center justify-between">
-            <div>
+        <div className="mb-8 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <div className="flex-1">
               <h3 className="font-semibold text-sm text-zinc-900 dark:text-white">KO-Phase berechnen</h3>
               <p className="text-xs text-zinc-500 mt-1">
                 Nachdem alle Gruppenspiele Ergebnisse haben, werden hier die KO-Paarungen nach FIFA-2026-Regel berechnet
@@ -228,7 +228,7 @@ export default function AdminPanel() {
             <Button
               onClick={handleCalculateKnockout}
               disabled={calculatingKo}
-              className="bg-zinc-900 dark:bg-white/10 hover:bg-zinc-700 dark:hover:bg-white/15 text-white"
+              className="bg-zinc-900 dark:bg-white/10 hover:bg-zinc-700 dark:hover:bg-white/15 text-white w-full sm:w-auto"
             >
               {calculatingKo ? "Berechne..." : "KO-Phase berechnen"}
             </Button>
@@ -245,8 +245,8 @@ export default function AdminPanel() {
                 </Badge>
               </div>
 
-              <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm overflow-hidden">
-                <table className="w-full text-sm">
+              <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm overflow-x-auto">
+                <table className="w-full text-sm min-w-[600px]">
                   <thead>
                     <tr className="border-b border-zinc-100 dark:border-white/5">
                       <th className="text-left px-4 py-3 font-medium text-zinc-500 w-32">Datum</th>

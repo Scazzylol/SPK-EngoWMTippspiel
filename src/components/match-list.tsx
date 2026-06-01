@@ -266,9 +266,27 @@ export default function MatchList({ userId }: { userId: string }) {
 
               return (
                 <div key={match.id}>
-                  <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors">
-                    {/* Datum */}
-                    <div className="flex-shrink-0 w-24 text-xs text-zinc-400 font-medium">
+                  {/* Mobile layout */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors">
+                    {/* Top row: Date + Stage badge (mobile) */}
+                    <div className="flex items-center justify-between sm:hidden mb-1">
+                      <div className="text-xs text-zinc-400 font-medium">
+                        {new Date(match.matchDate).toLocaleDateString("de-DE", {
+                          day: "2-digit",
+                          month: "2-digit",
+                        })}{" "}
+                        {new Date(match.matchDate).toLocaleTimeString("de-DE", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}{" "}Uhr
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStageBadge(match.stage)}
+                      </div>
+                    </div>
+
+                    {/* Desktop date (hidden on mobile) */}
+                    <div className="hidden sm:block flex-shrink-0 w-24 text-xs text-zinc-400 font-medium">
                       {new Date(match.matchDate).toLocaleDateString("de-DE", {
                         day: "2-digit",
                         month: "2-digit",
@@ -281,21 +299,21 @@ export default function MatchList({ userId }: { userId: string }) {
                     </div>
 
                     {/* Teams + Score */}
-                    <div className="flex items-center gap-3 flex-1 justify-center">
-                      <span className={`font-medium text-right w-32 truncate flex items-center justify-end gap-2 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
-                        <span>{match.hasTeams ? match.homeTeam : "???"}</span>
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center flex-wrap sm:flex-nowrap">
+                      <span className={`font-medium text-right w-auto sm:w-32 truncate flex items-center justify-end gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
+                        <span className="truncate max-w-[100px] sm:max-w-none">{match.hasTeams ? match.homeTeam : "???"}</span>
                         {match.homeTeamCode && (
-                          <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
+                          <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain flex-shrink-0" />
                         )}
                       </span>
 
                       {match.hasTeams ? (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1">
                           <Input
                             type="number"
                             min="0"
                             max="99"
-                            className="w-12 h-9 text-center text-sm px-1 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                            className="w-10 sm:w-12 h-8 sm:h-9 text-center text-sm px-0.5 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
                             value={predictions[match.id]?.home ?? ""}
                             placeholder="-"
                             onChange={(e) => handlePredictionChange(match.id, "home", e.target.value)}
@@ -305,7 +323,7 @@ export default function MatchList({ userId }: { userId: string }) {
                             type="number"
                             min="0"
                             max="99"
-                            className="w-12 h-9 text-center text-sm px-1 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
+                            className="w-10 sm:w-12 h-8 sm:h-9 text-center text-sm px-0.5 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white focus:border-[#D40000] focus:ring-[#D40000]/30"
                             value={predictions[match.id]?.away ?? ""}
                             placeholder="-"
                             onChange={(e) => handlePredictionChange(match.id, "away", e.target.value)}
@@ -319,7 +337,7 @@ export default function MatchList({ userId }: { userId: string }) {
 
                       {/* Advancement picker – nur bei Unentschieden-Tipp */}
                       {needsAdvancement && !isMatchLocked && (
-                        <div className="flex items-center gap-1.5 mt-1">
+                        <div className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start mt-1 sm:mt-0">
                           <button
                             type="button"
                             onClick={() => handlePredictionChange(match.id, "advancementWinnerId", match.homeTeamId!)}
@@ -345,17 +363,18 @@ export default function MatchList({ userId }: { userId: string }) {
                         </div>
                       )}
 
-                      <span className={`font-medium w-32 truncate flex items-center gap-2 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
+                      <span className={`font-medium w-auto sm:w-32 truncate flex items-center gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
                         {match.awayTeamCode && (
-                          <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain" />
+                          <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain flex-shrink-0" />
                         )}
-                        <span>{match.hasTeams ? match.awayTeam : "???"}</span>
+                        <span className="truncate max-w-[100px] sm:max-w-none">{match.hasTeams ? match.awayTeam : "???"}</span>
                       </span>
                     </div>
 
                     {/* Badge + Buttons */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {getStageBadge(match.stage)}
+                    <div className="flex items-center gap-2 flex-shrink-0 justify-end sm:justify-start">
+                      {/* Desktop stage badge (hidden on mobile, shown in top row) */}
+                      <span className="hidden sm:inline">{getStageBadge(match.stage)}</span>
                       {isMatchLocked && match.hasTeams && (
                         <Button
                           size="sm"
@@ -367,7 +386,7 @@ export default function MatchList({ userId }: { userId: string }) {
                         </Button>
                       )}
                       {isMatchLocked ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 cursor-default border border-zinc-200 dark:border-white/5">
+                        <span className="inline-flex items-center gap-1.5 rounded-md px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-medium bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 cursor-default border border-zinc-200 dark:border-white/5">
                           🔒 Beendet
                         </span>
                       ) : (
@@ -377,13 +396,13 @@ export default function MatchList({ userId }: { userId: string }) {
                           disabled={isSaving || !hasInput || !match.hasTeams}
                           className={
                             isJustSaved
-                              ? "bg-green-600 hover:bg-green-700 text-white"
+                              ? "bg-green-600 hover:bg-green-700 text-white text-xs"
                               : isSaved
-                                ? "bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-300"
-                                : "bg-[#D40000] hover:bg-[#B00000] text-white"
+                                ? "bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-300 text-xs"
+                                : "bg-[#D40000] hover:bg-[#B00000] text-white text-xs"
                           }
                         >
-                          {!match.hasTeams ? "Teams unbekannt" : isSaving ? "..." : isJustSaved ? "✓ Gespeichert" : isSaved ? "Aktualisieren" : "Tipp speichern"}
+                          {!match.hasTeams ? "Teams unbekannt" : isSaving ? "..." : isJustSaved ? "✓" : isSaved ? "Akt." : "Speichern"}
                         </Button>
                       )}
                     </div>
