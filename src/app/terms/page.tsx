@@ -102,8 +102,6 @@ export default function TermsPage() {
               Die Rangliste wird automatisch auf Basis der erzielten Punkte berechnet und ist
               für alle Teilnehmer einsehbar. Bei Punktgleichstand entscheidet die höhere Anzahl
               an exakt getippten Ergebnissen, danach die höhere Anzahl an richtigen Tordifferenzen.
-              Der Veranstalter ist von der Teilnahme am Tippspiel ausgeschlossen, um
-              Interessenkonflikte zu vermeiden.
             </p>
 
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mt-10">
@@ -131,8 +129,7 @@ export default function TermsPage() {
             </h2>
             <p>
               Für die Teilnahme ist die Angabe eines Benutzernamens und Passworts erforderlich.
-              Die Angabe einer E-Mail-Adresse ist nicht notwendig, kann aber zur
-              Account-Wiederherstellung genutzt werden. Die Daten werden ausschließlich für den
+              Die Angabe einer E-Mail-Adresse ist nicht notwendig. Die Daten werden ausschließlich für den
               Betrieb des Tippspiels verwendet und nicht an Dritte weitergegeben. Jeder
               Teilnehmer kann die Löschung seines Accounts und der zugehörigen Daten jederzeit
               per Nachricht an den Veranstalter beantragen. Die Verarbeitung erfolgt auf Basis
