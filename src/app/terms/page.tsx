@@ -35,8 +35,7 @@ export default function TermsPage() {
               Dieses Tippspiel wird im privaten Kreis unter Kollegen und Bekannten der Sparkasse
               Engen-Gottmadingen veranstaltet. Die Teilnahme ist freiwillig und erfolgt ausschließlich
               zu Unterhaltungszwecken. Es handelt sich nicht um ein Glücksspiel im Sinne des
-              Glücksspielstaatsvertrags (GlüStV). Es wird kein Einsatz in Form von Geld oder
-              geldwerten Leistungen verlangt.
+              Glücksspielstaatsvertrags (GlüStV). 
             </p>
 
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mt-10">

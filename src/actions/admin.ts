@@ -28,6 +28,10 @@ export async function updateMatchResult(
   }
 
   try {
+    // Prüfen ob es ein Gruppenspiel ist
+    const [matchInfo] = await sql<{ stage: string }[]>`SELECT stage FROM "Match" WHERE id = ${matchId}`;
+    const isGroupMatch = matchInfo?.stage === "GROUP";
+
     await sql`
       UPDATE "Match"
       SET "homeScore" = ${homeScore}, "awayScore" = ${awayScore},
@@ -35,6 +39,13 @@ export async function updateMatchResult(
           "isLocked" = true, "updatedAt" = NOW()
       WHERE id = ${matchId}
     `;
+
+    // Bei Gruppen-Ergebnis-Änderung: alle KO-Team-Zuordnungen löschen,
+    // damit calculateKnockoutStage() beim nächsten autoAdvance sauber neu rechnet
+    if (isGroupMatch) {
+      await sql`UPDATE "Match" SET "homeTeamId" = NULL, "awayTeamId" = NULL WHERE stage != 'GROUP'::"Stage"`;
+      await calculateKnockoutStage();
+    }
 
     await autoAdvance();
     return { success: true };
@@ -46,16 +57,7 @@ export async function updateMatchResult(
 
 async function autoAdvance() {
   try {
-    // Nur R32 berechnen, wenn noch nicht fortgeschritten (R16 hat keine Teams)
-    const [r16Check] = await sql`
-      SELECT COUNT(*)::int AS cnt FROM "Match"
-      WHERE stage = 'ROUND_OF_16'::"Stage" AND "homeTeamId" IS NOT NULL
-    `;
-    if (r16Check.cnt === 0) {
-      await calculateKnockoutStage();
-    }
-
-    // Alle KO-Runden fortlaufend vorrücken, solange möglich
+    // KO-Runden fortlaufend vorrücken, solange möglich
     while (true) {
       const result = await advanceToNextRound();
       if ("error" in result) break;

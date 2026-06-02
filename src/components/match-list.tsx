@@ -259,6 +259,9 @@ export default function MatchList({ userId }: { userId: string }) {
               const hasInput = pred?.home && pred?.away && hasAdvancement;
 
               const hasResult = match.homeScore !== null && match.awayScore !== null;
+              const homeWon = hasResult && match.homeScore !== null && match.awayScore !== null && match.homeScore > match.awayScore;
+              const awayWon = hasResult && match.homeScore !== null && match.awayScore !== null && match.awayScore > match.homeScore;
+              const isDrawResult = hasResult && match.homeScore !== null && match.awayScore !== null && match.homeScore === match.awayScore;
               const isMatchLocked = match.isLocked || hasResult || new Date(match.matchDate) < new Date();
               const tips = matchTips[match.id];
               const isExpanded = expandedTips.has(match.id);
@@ -300,14 +303,29 @@ export default function MatchList({ userId }: { userId: string }) {
 
                     {/* Teams + Score */}
                     <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center flex-wrap sm:flex-nowrap">
-                      <span className={`font-medium text-right w-auto sm:w-32 truncate flex items-center justify-end gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
+                      <span className={`font-medium text-right w-auto sm:w-32 truncate flex items-center justify-end gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : homeWon ? "text-zinc-900 dark:text-white font-bold" : "text-zinc-700 dark:text-zinc-200"}`}>
                         <span className="truncate max-w-[100px] sm:max-w-none">{match.hasTeams ? match.homeTeam : "???"}</span>
                         {match.homeTeamCode && (
                           <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain flex-shrink-0" />
                         )}
                       </span>
 
-                      {match.hasTeams ? (
+                      {hasResult ? (
+                        <div className="flex flex-col items-center gap-0.5 min-w-[70px]">
+                          <span className={`text-lg font-bold tabular-nums leading-none ${isDrawResult ? "text-zinc-800 dark:text-zinc-100" : homeWon ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                            {match.homeScore} : {match.awayScore}
+                          </span>
+                          {pred?.home !== undefined && pred?.home !== "" ? (
+                            <span className="text-[11px] text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
+                              Dein Tipp: {pred.home}:{pred.away}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-zinc-400 dark:text-zinc-500 italic">
+                              Kein Tipp
+                            </span>
+                          )}
+                        </div>
+                      ) : match.hasTeams ? (
                         <div className="flex items-center gap-1">
                           <Input
                             type="number"
@@ -363,7 +381,7 @@ export default function MatchList({ userId }: { userId: string }) {
                         </div>
                       )}
 
-                      <span className={`font-medium w-auto sm:w-32 truncate flex items-center gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
+                      <span className={`font-medium w-auto sm:w-32 truncate flex items-center gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : awayWon ? "text-zinc-900 dark:text-white font-bold" : "text-zinc-700 dark:text-zinc-200"}`}>
                         {match.awayTeamCode && (
                           <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain flex-shrink-0" />
                         )}

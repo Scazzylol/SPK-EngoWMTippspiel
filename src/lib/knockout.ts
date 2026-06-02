@@ -127,6 +127,9 @@ async function getGroupResults(): Promise<{ groupKey: GroupKey; bestThird: strin
 }
 
 export async function calculateKnockoutStage() {
+  // Vorhandene KO-Team-Zuordnungen löschen, damit keine stale data übrig bleibt
+  await sql`UPDATE "Match" SET "homeTeamId" = NULL, "awayTeamId" = NULL WHERE stage != 'GROUP'::"Stage"`;
+
   const result = await getGroupResults();
   if ("error" in result) return { error: result.error };
 

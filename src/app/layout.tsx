@@ -39,7 +39,7 @@ export default function RootLayout({
         <ThemeProvider>
           <div className="relative z-10 flex flex-col min-h-full">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pt-14">{children}</main>
           </div>
         </ThemeProvider>
       </body>

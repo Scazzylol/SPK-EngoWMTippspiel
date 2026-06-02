@@ -16,7 +16,7 @@ export function ScoringInfo({ className }: { className?: string }) {
         Punktevergabe
       </span>
 
-      <div className="absolute left-0 top-full mt-2 w-80 rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-800 p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-80 rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-800 p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
           Punkte pro Spiel
         </div>
