@@ -2,23 +2,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Shield, Menu, X, LogOut } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import { useFormStatus } from "react-dom";
+import { logout } from "@/actions/auth";
+import { CircleDot, Trophy, Shield, Menu, X, LogOut } from "lucide-react";
 
 interface MobileNavProps {
   isAdmin: boolean;
   userName: string;
 }
 
+function LogoutForm() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors w-full text-left disabled:opacity-50"
+    >
+      <LogOut className="h-4 w-4" />
+      {pending ? "Wird ausgeloggt..." : "Abmelden"}
+    </button>
+  );
+}
+
 export function MobileNav({ isAdmin, userName }: MobileNavProps) {
   const [open, setOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-
-  async function handleLogout() {
-    setLoggingOut(true);
-    await authClient.signOut();
-    window.location.href = "/login";
-  }
 
   return (
     <>
@@ -45,6 +53,22 @@ export function MobileNav({ isAdmin, userName }: MobileNavProps) {
               </button>
             </div>
             <nav className="p-4 space-y-1">
+              <Link
+                href="/matches"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/5 transition-colors"
+              >
+                <CircleDot className="h-4 w-4" />
+                Spiele
+              </Link>
+              <Link
+                href="/leaderboard"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/5 transition-colors"
+              >
+                <Trophy className="h-4 w-4" />
+                Rangliste
+              </Link>
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -56,16 +80,9 @@ export function MobileNav({ isAdmin, userName }: MobileNavProps) {
                 </Link>
               )}
               <hr className="my-3 border-zinc-200 dark:border-white/10" />
-              <button
-                onClick={() => {
-                  handleLogout();
-                }}
-                disabled={loggingOut}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors w-full text-left disabled:opacity-50"
-              >
-                <LogOut className="h-4 w-4" />
-                {loggingOut ? "Wird ausgeloggt..." : "Abmelden"}
-              </button>
+              <form action={logout}>
+                <LogoutForm />
+              </form>
             </nav>
           </div>
         </div>

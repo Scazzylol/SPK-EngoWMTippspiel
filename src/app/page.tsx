@@ -91,7 +91,7 @@ export default async function Home() {
               </Link>
             ) : (
               <>
-                <Link href="/login">
+                <Link href="/login?mode=register">
                   <Button
                     size="lg"
                     className="h-12 px-8 text-base gap-2 bg-[#D40000] hover:bg-[#B00000] text-white shadow-lg shadow-[#D40000]/25"
