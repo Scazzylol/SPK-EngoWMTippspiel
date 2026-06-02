@@ -41,7 +41,7 @@ export default async function Navbar() {
               {admin && (
                 <Link
                   href="/admin"
-                  className="hidden md:flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
                 >
                   <Shield className="h-4 w-4" />
                   <span>Admin</span>

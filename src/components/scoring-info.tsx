@@ -1,22 +1,48 @@
+"use client";
+
+import { useState } from "react";
 import { Info } from "lucide-react";
 
-export function ScoringInfo({ className }: { className?: string }) {
+interface ScoringInfoProps {
+  className?: string;
+  direction?: "up" | "down";
+}
+
+export function ScoringInfo({ className, direction = "down" }: ScoringInfoProps) {
+  const [open, setOpen] = useState(false);
+
   const rules = [
     { points: 3, label: "Exaktes Ergebnis (bei klarem Sieg oder Gruppenphase)", highlight: true },
     { points: 1, label: "Richtige Tendenz", highlight: false },
     { points: 0, label: "Falscher Tipp", highlight: false },
   ];
 
+  const positionClasses = direction === "up"
+    ? "bottom-full mb-2"
+    : "top-full mt-2";
+
   return (
     <div
-      className={`group relative inline-flex items-center gap-1.5 ${className ?? ""}`}
+      className={`relative inline-flex items-center gap-1.5 ${className ?? ""}`}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
     >
-      <Info className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500 cursor-help" />
-      <span className="text-xs text-zinc-400 dark:text-zinc-500 cursor-help">
-        Punktevergabe
-      </span>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 cursor-pointer"
+      >
+        <Info className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500" />
+        <span className="text-xs text-zinc-400 dark:text-zinc-500">
+          Punktevergabe
+        </span>
+      </button>
 
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-80 rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-800 p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div
+        className={`absolute left-1/2 -translate-x-1/2 ${positionClasses} w-80 rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-800 p-3 shadow-lg transition-all duration-200 z-50 ${
+          open ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+        }`}
+      >
         <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
           Punkte pro Spiel
         </div>

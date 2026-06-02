@@ -148,7 +148,7 @@ export default async function Home() {
 
         {/* Scoring info */}
         <div className="mt-8 sm:mt-12 flex items-center justify-center">
-          <ScoringInfo />
+          <ScoringInfo direction="up" />
         </div>
 
         {/* Footer */}

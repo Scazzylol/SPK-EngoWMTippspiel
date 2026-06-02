@@ -18,6 +18,8 @@ interface MatchRow {
   awayScore: number | null;
   homeTeamId: string | null;
   awayTeamId: string | null;
+  advancementwinnerid: string | null;
+  advancementwinnername: string | null;
 }
 
 interface MatchResponse {
@@ -37,6 +39,8 @@ interface MatchResponse {
   isLocked: boolean;
   homeScore: number | null;
   awayScore: number | null;
+  advancementWinnerId: string | null;
+  advancementWinner: string | null;
 }
 
 export async function GET() {
@@ -57,10 +61,13 @@ export async function GET() {
         m.stage,
         m."isLocked",
         m."homeScore",
-        m."awayScore"
+        m."awayScore",
+        m."advancementWinnerId",
+        adv.name AS advancementWinnerName
       FROM "Match" m
       LEFT JOIN "Team" home ON m."homeTeamId" = home.id
       LEFT JOIN "Team" away ON m."awayTeamId" = away.id
+      LEFT JOIN "Team" adv ON m."advancementWinnerId" = adv.id
       LEFT JOIN "Group" g ON m."groupId" = g.id
       ORDER BY m."startTime", m."matchNumber"
     `;
@@ -82,6 +89,8 @@ export async function GET() {
       isLocked: row.islocked,
       homeScore: row.homeScore ?? null,
       awayScore: row.awayScore ?? null,
+      advancementWinnerId: row.advancementwinnerid ?? null,
+      advancementWinner: row.advancementwinnername ?? null,
     }));
 
     return NextResponse.json(matches);

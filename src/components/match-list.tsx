@@ -25,6 +25,8 @@ interface Match {
   isLocked: boolean;
   homeScore: number | null;
   awayScore: number | null;
+  advancementWinnerId: string | null;
+  advancementWinner: string | null;
 }
 
 interface MatchTip {
@@ -303,7 +305,7 @@ export default function MatchList({ userId }: { userId: string }) {
 
                     {/* Teams + Score */}
                     <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center flex-wrap sm:flex-nowrap">
-                      <span className={`font-medium text-right w-auto sm:w-32 truncate flex items-center justify-end gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : homeWon ? "text-zinc-900 dark:text-white font-bold" : "text-zinc-700 dark:text-zinc-200"}`}>
+                      <span className={`font-medium text-right w-auto sm:w-32 truncate flex items-center justify-end gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
                         <span className="truncate max-w-[100px] sm:max-w-none">{match.hasTeams ? match.homeTeam : "???"}</span>
                         {match.homeTeamCode && (
                           <img src={getFlagUrl(match.homeTeamCode)} alt="" className="w-5 h-3.5 object-contain flex-shrink-0" />
@@ -312,7 +314,7 @@ export default function MatchList({ userId }: { userId: string }) {
 
                       {hasResult ? (
                         <div className="flex flex-col items-center gap-0.5 min-w-[70px]">
-                          <span className={`text-lg font-bold tabular-nums leading-none ${isDrawResult ? "text-zinc-800 dark:text-zinc-100" : homeWon ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                          <span className="text-lg font-bold tabular-nums leading-none text-zinc-800 dark:text-zinc-100">
                             {match.homeScore} : {match.awayScore}
                           </span>
                           {pred?.home !== undefined && pred?.home !== "" ? (
@@ -322,6 +324,11 @@ export default function MatchList({ userId }: { userId: string }) {
                           ) : (
                             <span className="text-[11px] text-zinc-400 dark:text-zinc-500 italic">
                               Kein Tipp
+                            </span>
+                          )}
+                          {isKoStage(match.stage) && (
+                            <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
+                              Weiter: {match.advancementWinner || (homeWon ? match.homeTeam : match.awayTeam)}
                             </span>
                           )}
                         </div>
@@ -381,7 +388,7 @@ export default function MatchList({ userId }: { userId: string }) {
                         </div>
                       )}
 
-                      <span className={`font-medium w-auto sm:w-32 truncate flex items-center gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : awayWon ? "text-zinc-900 dark:text-white font-bold" : "text-zinc-700 dark:text-zinc-200"}`}>
+                      <span className={`font-medium w-auto sm:w-32 truncate flex items-center gap-1.5 text-sm ${!match.hasTeams ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
                         {match.awayTeamCode && (
                           <img src={getFlagUrl(match.awayTeamCode)} alt="" className="w-5 h-3.5 object-contain flex-shrink-0" />
                         )}
@@ -433,13 +440,20 @@ export default function MatchList({ userId }: { userId: string }) {
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5">
                         {tips.map((tip) => {
                           const isOwn = tip.userId === userId;
+                          const isExact = match.homeScore !== null && match.awayScore !== null &&
+                            tip.homeScore === match.homeScore && tip.awayScore === match.awayScore &&
+                            (!isKoStage(match.stage) || match.homeScore !== match.awayScore ||
+                             (tip.advancementWinnerId !== null && tip.advancementWinnerId === match.advancementWinnerId));
+                          const isDrawTip = isKoStage(match.stage) && tip.homeScore === tip.awayScore;
                           return (
                             <div
                               key={tip.userId}
                               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs border ${
-                                isOwn
-                                  ? "bg-[#D40000]/10 border-[#D40000]/30"
-                                  : "bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/5"
+                                isExact
+                                  ? "bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20"
+                                  : isOwn
+                                    ? "bg-[#D40000]/10 border-[#D40000]/30"
+                                    : "bg-white dark:bg-white/[0.03] border-zinc-200 dark:border-white/5"
                               }`}
                             >
                               <span className="font-medium truncate flex-1 text-zinc-700 dark:text-zinc-300">
@@ -449,11 +463,11 @@ export default function MatchList({ userId }: { userId: string }) {
                                 )}
                               </span>
                               <div className="flex flex-col items-end">
-                                <span className="font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-200">
+                                <span className={`font-mono font-bold tabular-nums ${isExact ? "text-green-600 dark:text-green-400" : "text-zinc-900 dark:text-zinc-200"}`}>
                                   {tip.homeScore}:{tip.awayScore}
                                 </span>
-                                {tip.advancementWinnerId && isKoStage(match.stage) && (
-                                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">
+                                {isDrawTip && tip.advancementWinnerId && (
+                                  <span className="text-[10px] mt-0.5 text-zinc-400 dark:text-zinc-500">
                                     Weiter: {tip.advancementWinnerId === match.homeTeamId ? match.homeTeam : match.awayTeam}
                                   </span>
                                 )}
