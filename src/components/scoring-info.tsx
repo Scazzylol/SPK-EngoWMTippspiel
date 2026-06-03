@@ -37,7 +37,7 @@ export function ScoringInfo({ className, direction = "down" }: ScoringInfoProps)
       </button>
 
       <div
-        className={`${isUp ? "bottom-full mb-2" : "top-full mt-2"} sm:left-1/2 sm:-translate-x-1/2 left-4 right-4 sm:w-80 w-auto absolute rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-800 p-3 shadow-lg transition-all duration-200 z-50 ${
+        className={`fixed sm:absolute top-1/2 -translate-y-1/2 left-4 right-4 w-auto ${isUp ? "sm:bottom-full sm:mb-2" : "sm:top-full sm:mt-2"} sm:left-1/2 sm:-translate-x-1/2 sm:right-auto sm:translate-y-0 sm:w-80 rounded-lg border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-800 p-3 shadow-lg transition-all duration-200 z-50 ${
           open ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >
