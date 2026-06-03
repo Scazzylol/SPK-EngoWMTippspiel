@@ -28,17 +28,17 @@ export default async function Navbar() {
               {/* Always-visible nav links (icon+text on md+, icon only on mobile) */}
               <Link
                 href="/matches"
-                className="flex items-center gap-1.5 px-1.5 md:px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                className="flex items-center gap-1.5 px-1.5 md:px-2 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
               >
                 <CircleDot className="h-4 w-4 shrink-0" />
-                <span className="hidden md:inline">Spiele</span>
+                <span>Spiele</span>
               </Link>
               <Link
                 href="/leaderboard"
-                className="flex items-center gap-1.5 px-1.5 md:px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                className="flex items-center gap-1.5 px-1.5 md:px-2 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
               >
                 <Trophy className="h-4 w-4 shrink-0" />
-                <span className="hidden md:inline">Rangliste</span>
+                <span>Rangliste</span>
               </Link>
               {/* Desktop-only items */}
               <div className="hidden md:flex items-center gap-1">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CircleDot, Trophy, Shield, Menu, X, LogOut } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import { logout } from "@/actions/auth";
 
 interface MobileNavProps {
   isAdmin: boolean;
@@ -16,7 +16,11 @@ export function MobileNav({ isAdmin, userName }: MobileNavProps) {
 
   async function handleLogout() {
     setLoggingOut(true);
-    await authClient.signOut();
+    try {
+      await logout();
+    } catch {
+      // proceed even if server action fails
+    }
     window.location.href = "/login";
   }
 

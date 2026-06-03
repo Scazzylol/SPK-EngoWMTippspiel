@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { logout } from "@/actions/auth";
 
 export function LogoutButton() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   async function handleLogout() {
     setLoggingOut(true);
-    await authClient.signOut();
+    try {
+      await logout();
+    } catch {
+      // proceed even if server action fails
+    }
     window.location.href = "/login";
   }
 
