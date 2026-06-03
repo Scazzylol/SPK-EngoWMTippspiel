@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import { isAdmin } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LogoutButton } from "@/components/logout-button";
+import { MobileNav } from "@/components/mobile-nav";
 import { SparkasseLogo } from "@/components/sparkasse-logo";
 import { CircleDot, Trophy, Shield } from "lucide-react";
 
@@ -20,37 +21,43 @@ export default async function Navbar() {
           <span className="hidden sm:inline text-zinc-800 dark:text-zinc-200">WM Tippspiel 2026</span>
         </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1 min-w-0">
           <ThemeToggle />
           {user ? (
             <>
+              {/* Always-visible nav links (icon+text on md+, icon only on mobile) */}
               <Link
                 href="/matches"
-                className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                className="flex items-center gap-1.5 px-1.5 md:px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
               >
                 <CircleDot className="h-4 w-4 shrink-0" />
-                <span>Spiele</span>
+                <span className="hidden md:inline">Spiele</span>
               </Link>
               <Link
                 href="/leaderboard"
-                className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                className="flex items-center gap-1.5 px-1.5 md:px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
               >
                 <Trophy className="h-4 w-4 shrink-0" />
-                <span>Rangliste</span>
+                <span className="hidden md:inline">Rangliste</span>
               </Link>
-              {admin && (
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
-                >
-                  <Shield className="h-4 w-4" />
-                  <span>Admin</span>
-                </Link>
-              )}
-              <span className="hidden md:inline text-sm text-zinc-500 px-1">
-                {user.name}
-              </span>
-              <LogoutButton />
+              {/* Desktop-only items */}
+              <div className="hidden md:flex items-center gap-1">
+                {admin && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-medium transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/5"
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Admin</span>
+                  </Link>
+                )}
+                <span className="text-sm text-zinc-500 px-1">{user.name}</span>
+                <LogoutButton />
+              </div>
+              {/* Mobile-only: hamburger with admin + username + logout */}
+              <div className="md:hidden">
+                <MobileNav isAdmin={admin} userName={user.name} />
+              </div>
             </>
           ) : (
             <Link href="/login">

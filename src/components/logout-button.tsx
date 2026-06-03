@@ -1,28 +1,27 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { logout } from "@/actions/auth";
-import { useFormStatus } from "react-dom";
+import { authClient } from "@/lib/auth-client";
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+export function LogoutButton() {
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    await authClient.signOut();
+    window.location.href = "/login";
+  }
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      type="submit"
-      disabled={pending}
+      onClick={handleLogout}
+      disabled={loggingOut}
       className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5"
     >
-      {pending ? "Wird ausgeloggt..." : "Ausloggen"}
+      {loggingOut ? "Wird ausgeloggt..." : "Ausloggen"}
     </Button>
-  );
-}
-
-export function LogoutButton() {
-  return (
-    <form action={logout}>
-      <SubmitButton />
-    </form>
   );
 }
