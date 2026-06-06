@@ -41,10 +41,11 @@ export async function updateMatchResult(
     `;
 
     // Bei Gruppen-Ergebnis-Änderung: alle KO-Team-Zuordnungen löschen,
-    // damit calculateKnockoutStage() beim nächsten autoAdvance sauber neu rechnet
+    // damit beim späteren Klick auf "KO berechnen" sauber neu gerechnet wird.
+    // calculateKnockoutStage() wird hier NICHT aufgerufen – das passiert erst
+    // manuell über den Admin-Button, nachdem die gesamte Gruppenphase beendet ist.
     if (isGroupMatch) {
       await sql`UPDATE "Match" SET "homeTeamId" = NULL, "awayTeamId" = NULL WHERE stage != 'GROUP'::"Stage"`;
-      await calculateKnockoutStage();
     }
 
     await autoAdvance();
