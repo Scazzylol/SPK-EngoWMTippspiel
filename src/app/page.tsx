@@ -90,26 +90,15 @@ export default async function Home() {
                 </Button>
               </Link>
             ) : (
-              <>
-                <Link href="/login?mode=register">
-                  <Button
-                    size="lg"
-                    className="h-12 px-8 text-base gap-2 bg-[#D40000] hover:bg-[#B00000] text-white shadow-lg shadow-[#D40000]/25"
-                  >
-                    Jetzt registrieren
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-12 px-8 text-base"
-                  >
-                    Anmelden
-                  </Button>
-                </Link>
-              </>
+              <Link href="/login">
+                <Button
+                  size="lg"
+                  className="h-12 px-8 text-base gap-2 bg-[#D40000] hover:bg-[#B00000] text-white shadow-lg shadow-[#D40000]/25"
+                >
+                  Anmelden
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             )}
           </div>
 

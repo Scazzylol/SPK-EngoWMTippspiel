@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,24 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SparkasseLogo } from "@/components/sparkasse-logo";
 
-function sanitizeUsername(raw: string): string {
-  return raw.replace(/[^a-zA-Z0-9_.]/g, "").slice(0, 30);
-}
-
 const errorTranslations: Record<string, string> = {
   "Invalid username or password": "Name oder Passwort falsch",
-  "Username is already taken. Please try another.": "Name bereits vergeben",
-  "Username is already taken": "Name bereits vergeben",
-  "Username is too short": "Name zu kurz (mind. 3 Zeichen)",
-  "Username is too long": "Name zu lang (max. 30 Zeichen)",
-  "Username is invalid": "Ungültiger Name (nur Buchstaben, Zahlen, _ und .)",
-  "Password too short": "Passwort zu kurz (mind. 8 Zeichen)",
-  "Password too long": "Passwort zu lang",
-  "User already exists": "Benutzer existiert bereits",
-  "User already exists. Use another email.": "Benutzer existiert bereits",
-  "Failed to create user": "Fehler bei der Registrierung",
   "Failed to create session": "Fehler beim Einloggen",
-  "Invalid email": "Ungültige E-Mail",
 };
 
 function translateError(err: any): string {
@@ -37,54 +22,25 @@ function translateError(err: any): string {
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "register");
   const [rawUsername, setRawUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const username = sanitizeUsername(rawUsername);
-
-  useEffect(() => {
-    setIsLogin(searchParams.get("mode") !== "register");
-  }, [searchParams]);
+  const username = rawUsername.replace(/[^a-zA-Z0-9_.]/g, "").slice(0, 30);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    if (!isLogin && username.length < 3) {
-      setError("Der Name muss mindestens 3 Zeichen lang sein");
-      setLoading(false);
-      return;
-    }
-
     try {
-      if (isLogin) {
-        const result = await authClient.signIn.username({ username, password });
-        if (result?.data) {
-          router.push("/matches");
-          router.refresh();
-        } else {
-          setError(translateError(result?.error));
-        }
+      const result = await authClient.signIn.username({ username, password });
+      if (result?.data) {
+        router.push("/matches");
+        router.refresh();
       } else {
-        const placeholderEmail = `${username}@wmtippspiel.app`;
-        const result = await authClient.signUp.email({
-          email: placeholderEmail,
-          password,
-          name: username,
-          username,
-          callbackURL: "/matches",
-        });
-        if (result?.data) {
-          router.push("/matches");
-          router.refresh();
-        } else {
-          setError(translateError(result?.error));
-        }
+        setError(translateError(result?.error));
       }
     } catch (err: any) {
       setError(err.message || "Etwas ist schiefgelaufen");
@@ -112,16 +68,21 @@ function LoginForm() {
           </div>
         </div>
 
+        {/* Registration closed notice */}
+        <div className="rounded-xl border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10 px-5 py-4 text-center">
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            Die Registrierung ist geschlossen
+          </p>
+        </div>
+
         {/* Card */}
         <Card className="border-zinc-200 dark:border-white/10 bg-white dark:bg-white/[0.03] backdrop-blur-sm shadow-xl">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl font-bold text-center text-zinc-900 dark:text-white">
-              {isLogin ? "Anmelden" : "Registrieren"}
+              Anmelden
             </CardTitle>
             <CardDescription className="text-center text-zinc-500 dark:text-zinc-400">
-              {isLogin
-                ? "Gib deinen Namen und dein Passwort ein"
-                : "Erstelle einen neuen Account für das Tippspiel"}
+              Gib deinen Namen und dein Passwort ein
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -140,11 +101,6 @@ function LoginForm() {
                   autoCapitalize="off"
                   className="h-11 bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-[#D40000] focus:ring-[#D40000]/30"
                 />
-                {!isLogin && rawUsername !== username && (
-                  <p className="text-xs text-zinc-500">
-                    Wird als &quot;{username}&quot; registriert
-                  </p>
-                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Passwort (min. 8 Zeichen)</Label>
@@ -169,27 +125,9 @@ function LoginForm() {
                 className="w-full h-11 bg-[#D40000] hover:bg-[#B00000] text-white font-medium"
                 disabled={loading}
               >
-                {loading ? "Bitte warten..." : isLogin ? "Einloggen" : "Registrieren"}
+                {loading ? "Bitte warten..." : "Einloggen"}
               </Button>
             </form>
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !isLogin;
-                  setIsLogin(next);
-                  router.replace(next ? "/login" : "/login?mode=register");
-                }}
-                className="text-sm text-zinc-500 hover:text-[#D40000] transition-colors"
-              >
-                {isLogin
-                  ? "Noch keinen Account? "
-                  : "Bereits einen Account? "}
-                <span className="font-medium underline underline-offset-4">
-                  {isLogin ? "Registrieren" : "Einloggen"}
-                </span>
-              </button>
-            </div>
           </CardContent>
         </Card>
 
