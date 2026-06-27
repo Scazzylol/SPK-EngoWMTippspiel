@@ -50,14 +50,21 @@ function getMatrixMatchups(advancingGroupLetters: string[]): Record<string, stri
 }
 
 const R32_R16_PAIRINGS = [
-  [0, 2],   // 73 vs 75 → 89
-  [1, 4],   // 74 vs 77 → 90
-  [3, 5],   // 76 vs 78 → 91
-  [6, 7],   // 79 vs 80 → 92
-  [8, 9],   // 81 vs 82 → 93
-  [10, 11], // 83 vs 84 → 94
-  [12, 14], // 85 vs 87 → 95
-  [13, 15], // 86 vs 88 → 96
+  [1, 4],   // W74 vs W77 → 89
+  [0, 2],   // W73 vs W75 → 90
+  [3, 5],   // W76 vs W78 → 91
+  [6, 7],   // W79 vs W80 → 92
+  [10, 11], // W83 vs W84 → 93
+  [8, 9],   // W81 vs W82 → 94
+  [13, 15], // W86 vs W88 → 95
+  [12, 14], // W85 vs W87 → 96
+];
+
+const R16_QF_PAIRINGS = [
+  [0, 1],   // W89 vs W90 → 97
+  [4, 5],   // W93 vs W94 → 98
+  [2, 3],   // W91 vs W92 → 99
+  [6, 7],   // W95 vs W96 → 100
 ];
 
 export async function calculateKnockoutStage() {
@@ -199,9 +206,13 @@ export async function advanceToNextRound() {
     } else {
       const winners = prevMatches.map((m) => getMatchWinner(m));
 
-      if (stage === "ROUND_OF_32") {
+      const pairings = stage === "ROUND_OF_32" ? R32_R16_PAIRINGS
+        : stage === "ROUND_OF_16" ? R16_QF_PAIRINGS
+        : null;
+
+      if (pairings) {
         for (let i = 0; i < nextMatches.length; i++) {
-          const [homeIdx, awayIdx] = R32_R16_PAIRINGS[i];
+          const [homeIdx, awayIdx] = pairings[i];
           const homeId = winners[homeIdx];
           const awayId = winners[awayIdx];
           if (homeId && awayId) {
