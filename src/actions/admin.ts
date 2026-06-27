@@ -28,10 +28,6 @@ export async function updateMatchResult(
   }
 
   try {
-    // Prüfen ob es ein Gruppenspiel ist
-    const [matchInfo] = await sql<{ stage: string }[]>`SELECT stage FROM "Match" WHERE id = ${matchId}`;
-    const isGroupMatch = matchInfo?.stage === "GROUP";
-
     await sql`
       UPDATE "Match"
       SET "homeScore" = ${homeScore}, "awayScore" = ${awayScore},
@@ -40,14 +36,7 @@ export async function updateMatchResult(
       WHERE id = ${matchId}
     `;
 
-    // Bei Gruppen-Ergebnis-Änderung: alle KO-Team-Zuordnungen löschen,
-    // damit beim späteren Klick auf "KO berechnen" sauber neu gerechnet wird.
-    // calculateKnockoutStage() wird hier NICHT aufgerufen – das passiert erst
-    // manuell über den Admin-Button, nachdem die gesamte Gruppenphase beendet ist.
-    if (isGroupMatch) {
-      await sql`UPDATE "Match" SET "homeTeamId" = NULL, "awayTeamId" = NULL WHERE stage != 'GROUP'::"Stage"`;
-    }
-
+    // autoAdvance rückt KO-Runden vor, soweit möglich
     await autoAdvance();
     return { success: true };
   } catch (e) {
