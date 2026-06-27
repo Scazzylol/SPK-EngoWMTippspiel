@@ -154,7 +154,7 @@ export default function AdminPanel() {
     setCalculatingKo(true);
     setMessage(null);
     const result = await calculateKnockout();
-    if (result?.error) {
+    if ("error" in result) {
       setMessage({ type: "error", text: result.error });
     } else {
       setMessage({ type: "success", text: "KO-Phase berechnet – Teams wurden gesetzt" });

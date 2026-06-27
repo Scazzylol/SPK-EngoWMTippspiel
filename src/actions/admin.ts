@@ -148,19 +148,16 @@ export async function getAdminMatches(): Promise<AdminMatch[]> {
   }
 }
 
-export async function calculateKnockout() {
+export async function calculateKnockout(): Promise<{ success: boolean } | { error: string }> {
   if (!(await isAdmin())) {
     return { error: "Keine Admin-Rechte" };
   }
 
   try {
-    const result = await calculateKnockoutStage();
-    if ("error" in result) {
-      return { error: result.error };
-    }
+    await calculateKnockoutStage();
 
     const advanced = await advanceToNextRound();
-    if ("error" in advanced && !advanced.error?.includes("Keine neue Runde")) {
+    if ("error" in advanced && advanced.error && !advanced.error.includes("Keine neue Runde")) {
       return { error: advanced.error };
     }
 

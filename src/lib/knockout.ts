@@ -49,12 +49,6 @@ function getMatrixMatchups(advancingGroupLetters: string[]): Record<string, stri
   return entry?.matchups ?? null;
 }
 
-function thirdFromGroup(matchups: Record<string, string>, groupKey: GroupKey, winnerGroup: string): string | null {
-  const thirdGroup = matchups[winnerGroup];
-  if (!thirdGroup || !groupKey[thirdGroup]) return null;
-  return groupKey[thirdGroup].third;
-}
-
 const R32_R16_PAIRINGS = [
   [0, 2],   // 73 vs 75 → 89
   [1, 4],   // 74 vs 77 → 90
@@ -66,7 +60,9 @@ const R32_R16_PAIRINGS = [
   [13, 15], // 86 vs 88 → 96
 ];
 
-async function getGroupResults(): Promise<{ groupKey: GroupKey; bestThird: string[] } | { error: string }> {
+export async function calculateKnockoutStage() {
+  await sql`UPDATE "Match" SET "homeTeamId" = NULL, "awayTeamId" = NULL WHERE stage != 'GROUP'::"Stage"`;
+
   const groups = await sql<GroupRow[]>`SELECT id, name FROM "Group" ORDER BY name`;
 
   const groupKey: GroupKey = {} as GroupKey;
@@ -97,9 +93,7 @@ async function getGroupResults(): Promise<{ groupKey: GroupKey; bestThird: strin
       return { teamId: team.id, pts, gd: gf - ga, gf, played: matches.length };
     }));
 
-    if (standings.length === 0 || standings.some((s) => s.played < 3)) {
-      return { error: `Gruppe ${letter}: nicht alle Spiele beendet` };
-    }
+    if (standings.some((s) => s.played < 3)) continue;
 
     standings.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
     groupKey[letter] = {
@@ -116,48 +110,41 @@ async function getGroupResults(): Promise<{ groupKey: GroupKey; bestThird: strin
     });
   }
 
-  thirdRanked.sort((a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
-  const bestThird = thirdRanked.slice(0, 8);
+  const allGroupsComplete = Object.keys(groupKey).length === 12;
+  let matchups: Record<string, string> | null = null;
 
-  if (bestThird.length < 8) {
-    return { error: "Nicht genug Gruppendritte verfügbar" };
+  if (allGroupsComplete) {
+    thirdRanked.sort((a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
+    const bestThird = thirdRanked.slice(0, 8).map((t) => t.teamId);
+
+    const advancingGroupLetters = Object.keys(groupKey).filter((g) =>
+      bestThird.includes(groupKey[g].third)
+    );
+
+    matchups = getMatrixMatchups(advancingGroupLetters);
   }
 
-  return { groupKey, bestThird: bestThird.map((t) => t.teamId) };
-}
-
-export async function calculateKnockoutStage() {
-  // Vorhandene KO-Team-Zuordnungen löschen, damit keine stale data übrig bleibt
-  await sql`UPDATE "Match" SET "homeTeamId" = NULL, "awayTeamId" = NULL WHERE stage != 'GROUP'::"Stage"`;
-
-  const result = await getGroupResults();
-  if ("error" in result) return { error: result.error };
-
-  const { groupKey, bestThird } = result;
-  const advancingGroupLetters = Object.keys(groupKey).filter((g) =>
-    bestThird.includes(groupKey[g].third)
-  );
-
-  const matchups = getMatrixMatchups(advancingGroupLetters);
-  if (!matchups) return { error: "Keine gültige Drittplatzierte-Matrix für diese Kombination gefunden" };
+  function grp(l: string): { winner: string; runner: string; third: string } | undefined {
+    return groupKey[l as keyof typeof groupKey];
+  }
 
   const r32Matchups: { home: string | null; away: string | null }[] = [
-    { home: groupKey.A.runner, away: groupKey.B.runner },                             // 73: 2A vs 2B
-    { home: groupKey.E.winner, away: thirdFromGroup(matchups, groupKey, "E") },       // 74: 1E vs 3rd
-    { home: groupKey.F.winner, away: groupKey.C.runner },                             // 75: 1F vs 2C
-    { home: groupKey.C.winner, away: groupKey.F.runner },                             // 76: 1C vs 2F
-    { home: groupKey.I.winner, away: thirdFromGroup(matchups, groupKey, "I") },       // 77: 1I vs 3rd
-    { home: groupKey.E.runner, away: groupKey.I.runner },                             // 78: 2E vs 2I
-    { home: groupKey.A.winner, away: thirdFromGroup(matchups, groupKey, "A") },       // 79: 1A vs 3rd
-    { home: groupKey.L.winner, away: thirdFromGroup(matchups, groupKey, "L") },       // 80: 1L vs 3rd
-    { home: groupKey.D.winner, away: thirdFromGroup(matchups, groupKey, "D") },       // 81: 1D vs 3rd
-    { home: groupKey.G.winner, away: thirdFromGroup(matchups, groupKey, "G") },       // 82: 1G vs 3rd
-    { home: groupKey.K.runner, away: groupKey.L.runner },                             // 83: 2K vs 2L
-    { home: groupKey.H.winner, away: groupKey.J.runner },                             // 84: 1H vs 2J
-    { home: groupKey.B.winner, away: thirdFromGroup(matchups, groupKey, "B") },       // 85: 1B vs 3rd
-    { home: groupKey.J.winner, away: groupKey.H.runner },                             // 86: 1J vs 2H
-    { home: groupKey.K.winner, away: thirdFromGroup(matchups, groupKey, "K") },       // 87: 1K vs 3rd
-    { home: groupKey.D.runner, away: groupKey.G.runner },                             // 88: 2D vs 2G
+    { home: grp("A")?.runner ?? null, away: grp("B")?.runner ?? null },
+    { home: grp("E")?.winner ?? null, away: matchups ? grp(matchups.E)?.third ?? null : null },
+    { home: grp("F")?.winner ?? null, away: grp("C")?.runner ?? null },
+    { home: grp("C")?.winner ?? null, away: grp("F")?.runner ?? null },
+    { home: grp("I")?.winner ?? null, away: matchups ? grp(matchups.I)?.third ?? null : null },
+    { home: grp("E")?.runner ?? null, away: grp("I")?.runner ?? null },
+    { home: grp("A")?.winner ?? null, away: matchups ? grp(matchups.A)?.third ?? null : null },
+    { home: grp("L")?.winner ?? null, away: matchups ? grp(matchups.L)?.third ?? null : null },
+    { home: grp("D")?.winner ?? null, away: matchups ? grp(matchups.D)?.third ?? null : null },
+    { home: grp("G")?.winner ?? null, away: matchups ? grp(matchups.G)?.third ?? null : null },
+    { home: grp("K")?.runner ?? null, away: grp("L")?.runner ?? null },
+    { home: grp("H")?.winner ?? null, away: grp("J")?.runner ?? null },
+    { home: grp("B")?.winner ?? null, away: matchups ? grp(matchups.B)?.third ?? null : null },
+    { home: grp("J")?.winner ?? null, away: grp("H")?.runner ?? null },
+    { home: grp("K")?.winner ?? null, away: matchups ? grp(matchups.K)?.third ?? null : null },
+    { home: grp("D")?.runner ?? null, away: grp("G")?.runner ?? null },
   ];
 
   const r32Matches = await sql<MatchIdRow[]>`SELECT id FROM "Match" WHERE stage = 'ROUND_OF_32'::"Stage" ORDER BY "matchNumber"`;
